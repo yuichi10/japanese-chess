@@ -61,9 +61,10 @@ public class LoginActivity extends AppCompatActivity {
                 {
                     signUp(deveiceId);
                 } else {
-                    Intent intent = new Intent(getApplication(), RoomListActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, RoomListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                    LoginActivity.this.finish();
                 }
             }
 
