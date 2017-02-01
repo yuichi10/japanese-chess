@@ -10,6 +10,7 @@ public class UserModel {
     public int loseNum;
 
     public UserModel(){}
+
     public UserModel(String username, int winNum, int loseNum)
     {
         this.username = username;

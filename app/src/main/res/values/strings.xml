@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">JapaneseChess</string>
+
+    <!-- firebase -->
     <string name="firebase_users">users</string>
     <string name="firebase_rooms">rooms</string>
+
+    <!-- shared preferences -->
+    <string name="shared_data">DataSave</string>
+    <string name="shared_data_username">UserName</string>
+    <string name="shared_data_device_id">DeviceID</string>
 </resources>
