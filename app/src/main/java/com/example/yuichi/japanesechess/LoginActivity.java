@@ -1,11 +1,15 @@
 package com.example.yuichi.japanesechess;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.example.yuichi.japanesechess.firebasemodel.UserModel;
 import com.google.firebase.database.DataSnapshot;
@@ -17,41 +21,54 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginActivity extends AppCompatActivity {
     private final String FirebaseUser = "users";
     private DatabaseReference mDatabase;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        Log.d("Login", getDeviceID());
         login(getDeviceID());
     }
 
     private String getDeviceID() {
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        Log.d("Login", telephonyManager.getDeviceId());
         String deviceId = telephonyManager.getDeviceId();
         return deviceId;
     }
 
-    private void login(String deveiceId) {
+    private void signUp(final String deviceId) {
+        setContentView(R.layout.activity_login);
+        EditText userNameEditText = (EditText)findViewById(R.id.editUserName);
+        userName = userNameEditText.getText().toString();
+        Button loginButton = (Button)findViewById(R.id.loginButton);
+        View.OnClickListener loginButtonListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UserModel user = new UserModel(userName, 0, 0);
+                mDatabase.child(FirebaseUser).child(deviceId).setValue(user);
+                login(deviceId);
+            }
+        };
+        loginButton.setOnClickListener(loginButtonListener);
+    }
+
+    private void login(final String deveiceId) {
         ValueEventListener isUserListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("Login Listner", "get data");
                 UserModel user = dataSnapshot.getValue(UserModel.class);
                 if (user == null)
                 {
-                    setContentView(R.layout.activity_login);
+                    signUp(deveiceId);
                 } else {
-                    setContentView(R.layout.room_list);
+                    Intent intent = new Intent(getApplication(), RoomListActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
-                Log.d("Login Listner", "exist");
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         };
         mDatabase.child(FirebaseUser).addListenerForSingleValueEvent(isUserListener);
     }

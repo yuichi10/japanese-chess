@@ -10,8 +10,37 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.yuichi.japanesechess.LoginActivity">
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/editUserName"
+        tools:text=" "
+        android:maxLength="12"
+        android:singleLine="false"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textUserName"
+        android:layout_toEndOf="@+id/textUserName" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:id="@+id/textUserName"
+        android:text="user name: "
+        android:textSize="24sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/editUserName"
+        android:layout_alignParentTop="true" />
+
+    <Button
+        android:text="Login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textUserName"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="15dp"
+        android:id="@+id/loginButton" />
 </RelativeLayout>
