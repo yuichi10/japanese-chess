@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">JapaneseChess</string>
+    <string name="firebase_users">users</string>
+    <string name="firebase_rooms">rooms</string>
 </resources>

@@ -19,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
-    private final String FirebaseUser = "users";
     private DatabaseReference mDatabase;
     private String userName;
 
@@ -45,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 UserModel user = new UserModel(userName, 0, 0);
-                mDatabase.child(FirebaseUser).child(deviceId).setValue(user);
+                mDatabase.child(getString(R.string.firebase_users)).child(deviceId).setValue(user);
                 login(deviceId);
             }
         };
@@ -71,6 +70,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         };
-        mDatabase.child(FirebaseUser).addListenerForSingleValueEvent(isUserListener);
+        mDatabase.child(getString(R.string.firebase_users)).addListenerForSingleValueEvent(isUserListener);
     }
 }
