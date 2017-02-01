@@ -20,7 +20,5 @@ public class RoomListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         sharedData = getSharedPreferences("DataSave", Context.MODE_PRIVATE);
         setContentView(R.layout.room_list);
-        TextView textView = (TextView)findViewById(R.id.textView);
-        textView.setText(sharedData.getString(getString(R.string.shared_data_username), "Some One"));
     }
 }
