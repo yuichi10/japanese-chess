@@ -9,4 +9,5 @@
     <string name="shared_data">DataSave</string>
     <string name="shared_data_username">UserName</string>
     <string name="shared_data_device_id">DeviceID</string>
+    <string name="shared_data_current_room">CurrentRoom</string>
 </resources>
