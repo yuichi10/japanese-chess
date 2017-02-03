@@ -9,25 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.yuichi.japanesechess.adaptermodel.RoomListAdapter;
 import com.example.yuichi.japanesechess.adaptermodel.RoomListElementModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
-import com.example.yuichi.japanesechess.firebasemodel.UserModel;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by yuichi on 2017/02/01.
@@ -55,7 +48,9 @@ public class RoomListActivity extends AppCompatActivity {
             public void onClick(View v){
                 DatabaseReference roomDatabase = mDatabase.child(getString(R.string.firebase_rooms)).push();
                 String roomID = roomDatabase.getKey();
-                RoomModel room = new RoomModel(sharedData.getString(getString(R.string.shared_data_device_id), ""), "", "");
+                String maker_id = sharedData.getString(getString(R.string.shared_data_device_id), "");
+                String maker_name = sharedData.getString(getString(R.string.shared_data_username), "");
+                RoomModel room = new RoomModel(maker_name, maker_id, "");
                 if (room.maker == "") {
                     Intent intent = new Intent(RoomListActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -69,9 +64,6 @@ public class RoomListActivity extends AppCompatActivity {
     }
 
     private void setRoomList() {
-        HashMap<String, String> sss = new HashMap<>();
-        sss.put("aaaa", "aaaa");
-        sss.put("bbbb", "bbbb");
         final RoomListAdapter roomListAdapter = new RoomListAdapter(this);
 
         ChildEventListener roomListListener = new ChildEventListener() {
