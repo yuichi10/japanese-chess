@@ -29,12 +29,14 @@ import com.google.firebase.database.FirebaseDatabase;
 public class RoomListActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private SharedPreferences sharedData;
+    private SharedPreferences.Editor sharedEditor;
     ListView roomListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sharedData = getSharedPreferences(getString(R.string.shared_data), Context.MODE_PRIVATE);
+        sharedEditor = sharedData.edit();
         setContentView(R.layout.room_list);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         roomListView = (ListView)findViewById(R.id.room_list_view);
@@ -52,15 +54,24 @@ public class RoomListActivity extends AppCompatActivity {
                 String maker_name = sharedData.getString(getString(R.string.shared_data_username), "");
                 RoomModel room = new RoomModel(maker_name, maker_id, "");
                 if (room.maker == "") {
-                    Intent intent = new Intent(RoomListActivity.this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    RoomListActivity.this.finish();
+                    returnLogin();
+                    return;
                 }
                 roomDatabase.setValue(room);
-                sharedData.edit().putString(getString(R.string.shared_data_current_room), roomID);
+                sharedEditor.putString(getString(R.string.shared_data_current_room), roomID);
+                sharedEditor.apply();
+                Intent intent = new Intent(RoomListActivity.this, GameActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
+    }
+
+    private void returnLogin() {
+        Intent intent = new Intent(RoomListActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        RoomListActivity.this.finish();
     }
 
     private void setRoomList() {
