@@ -6,7 +6,11 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/create_new_room_footer"
+        android:layout_alignParentTop="true"
+        android:transcriptMode="alwaysScroll"
+        android:id="@+id/room_list_view" />
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,7 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp">
+        android:layout_marginBottom="12dp"
+        android:id="@+id/create_new_room_footer">
 
         <Button
             android:text="Create New Room"

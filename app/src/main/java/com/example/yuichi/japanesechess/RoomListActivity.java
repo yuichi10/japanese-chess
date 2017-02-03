@@ -6,12 +6,16 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.yuichi.japanesechess.adaptermodel.RoomListAdapter;
+import com.example.yuichi.japanesechess.adaptermodel.RoomListElementModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
 import com.example.yuichi.japanesechess.firebasemodel.UserModel;
 import com.google.firebase.database.ChildEventListener;
@@ -21,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,14 +69,21 @@ public class RoomListActivity extends AppCompatActivity {
     }
 
     private void setRoomList() {
-        final ArrayAdapter<String> arrayAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        HashMap<String, String> sss = new HashMap<>();
+        sss.put("aaaa", "aaaa");
+        sss.put("bbbb", "bbbb");
+        final RoomListAdapter roomListAdapter = new RoomListAdapter(this);
+
         ChildEventListener roomListListener = new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 RoomModel room = dataSnapshot.getValue(RoomModel.class);
-                arrayAdapter.add(dataSnapshot.getKey());
+                RoomListElementModel roomElement = new RoomListElementModel();
+                roomElement.setRoomID(dataSnapshot.getKey());
+                roomElement.setRoomModel(room);
+                roomListAdapter.add(roomElement);
+                roomListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -96,7 +108,15 @@ public class RoomListActivity extends AppCompatActivity {
         };
         mDatabase.child(getString(R.string.firebase_rooms)).
                 addChildEventListener(roomListListener);
-        roomListView.setAdapter(arrayAdapter);
+        roomListView.setAdapter(roomListAdapter);
+        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object model = parent.getItemAtPosition(position);
+                Log.d("Choose", "error");
+            }
+        });
     }
 
 }
