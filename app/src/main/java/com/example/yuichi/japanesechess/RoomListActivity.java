@@ -15,10 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
+import com.example.yuichi.japanesechess.firebasemodel.RoomProgress;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 
 /**
  * Created by yuichi on 2017/02/01.
@@ -46,6 +46,7 @@ public class RoomListActivity extends AppCompatActivity {
     }
 
     private void createNewRoom() {
+        // 新しくルームを作る
         Button createNewRoomButton = (Button) findViewById(R.id.create_new_room_button);
         createNewRoomButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -59,12 +60,10 @@ public class RoomListActivity extends AppCompatActivity {
                     return;
                 }
                 roomDatabase.setValue(room);
+                // ローカルに自身が今いるルームIDを保存
                 sharedEditor.putString(getString(R.string.shared_data_current_room), roomID);
                 sharedEditor.apply();
-
-                Intent intent = new Intent(RoomListActivity.this, GameActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                moveGameActivity();
             }
         });
     }
@@ -91,9 +90,21 @@ public class RoomListActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // すでにあるルームに参加
                 DatabaseReference ref = mAdapter.getRef(position);
-                Log.d("Choose", position + "");
-                Log.d("Choose", ref.getKey());
+                RoomModel room = (RoomModel)parent.getItemAtPosition(position);
+                if (room.getProgress() != RoomProgress.WAITING){
+                    return;
+                }
+                String userID = sharedData.getString(getString(R.string.shared_data_device_id), "");
+                // ローカルに自身が今いるルームIDを保存
+                sharedEditor.putString(getString(R.string.shared_data_current_room), ref.getKey());
+                sharedEditor.apply();
+                // ルームデータベースを更新
+                room.setSecond(userID);
+                room.setProgress(RoomProgress.GATHERED);
+                ref.setValue(room);
+                moveGameActivity();
             }
         });
     }
@@ -103,6 +114,12 @@ public class RoomListActivity extends AppCompatActivity {
         if (roomId != "") {
             mDatabase.child(getString(R.string.firebase_rooms)).child(roomId).removeValue();
         }
+    }
+
+    private void moveGameActivity() {
+        Intent intent = new Intent(RoomListActivity.this, GameActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     @Override
