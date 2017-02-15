@@ -5,19 +5,17 @@ import android.content.Entity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
-import com.example.yuichi.japanesechess.adaptermodel.RoomListAdapter;
-import com.example.yuichi.japanesechess.adaptermodel.RoomListElementModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -31,6 +29,7 @@ public class RoomListActivity extends AppCompatActivity {
     private SharedPreferences sharedData;
     private SharedPreferences.Editor sharedEditor;
     ListView roomListView;
+    FirebaseListAdapter<RoomModel> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +39,8 @@ public class RoomListActivity extends AppCompatActivity {
         setContentView(R.layout.room_list);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         roomListView = (ListView)findViewById(R.id.room_list_view);
-        setRoomList();
+        //setRoomList();
+        setRoomListView();
         createNewRoom();
     }
 
@@ -74,52 +74,31 @@ public class RoomListActivity extends AppCompatActivity {
         RoomListActivity.this.finish();
     }
 
-    private void setRoomList() {
-        final RoomListAdapter roomListAdapter = new RoomListAdapter(this);
-
-        ChildEventListener roomListListener = new ChildEventListener() {
-
+    private void setRoomListView() {
+        DatabaseReference roomsDataRef = mDatabase.child(getString(R.string.firebase_rooms));
+        mAdapter = new FirebaseListAdapter<RoomModel>(this, RoomModel.class, android.R.layout.two_line_list_item, roomsDataRef) {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                RoomModel room = dataSnapshot.getValue(RoomModel.class);
-                RoomListElementModel roomElement = new RoomListElementModel();
-                roomElement.setRoomID(dataSnapshot.getKey());
-                roomElement.setRoomModel(room);
-                roomListAdapter.add(roomElement);
-                roomListAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            protected void populateView(View v, RoomModel model, int position) {
+                DatabaseReference roomRef = getRef(position);
+                ((TextView)v.findViewById(android.R.id.text1)).setText(model.getMaker());
+                ((TextView)v.findViewById(android.R.id.text2)).setText(roomRef.getKey());
             }
         };
-        mDatabase.child(getString(R.string.firebase_rooms)).
-                addChildEventListener(roomListListener);
-        roomListView.setAdapter(roomListAdapter);
+        roomListView.setAdapter(mAdapter);
         roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object model = parent.getItemAtPosition(position);
-                Log.d("Choose", "error");
+                DatabaseReference ref = mAdapter.getRef(position);
+                Log.d("Choose", position + "");
+                Log.d("Choose", ref.getKey());
             }
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mAdapter.cleanup();
+    }
 }
