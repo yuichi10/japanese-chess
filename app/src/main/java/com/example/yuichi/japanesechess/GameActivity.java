@@ -10,8 +10,15 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
 
+import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
+import com.example.yuichi.japanesechess.firebasemodel.RoomProgress;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Random;
 
 /**
  * Created by yuichi on 2017/02/03.
@@ -21,6 +28,9 @@ public class GameActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private SharedPreferences sharedData;
     private AlertDialog.Builder mAlertDialog;
+    DatabaseReference mRoomRef;
+    private String mRoomID;
+    private String mUserID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +38,52 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.play_game);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         sharedData = getSharedPreferences(getString(R.string.shared_data), Context.MODE_PRIVATE);
-        String roomId = sharedData.getString(getString(R.string.shared_data_current_room), "");
+        mRoomID = sharedData.getString(getString(R.string.shared_data_current_room), "");
+        mUserID = sharedData.getString(getString(R.string.shared_data_device_id), "");
+        if (mRoomID == "" || mUserID == "") {
+            finish();
+            return;
+        }
+        mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
         setBackAram();
         TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(roomId);
+        textView.setText(mRoomID);
+        initGame();
+    }
+
+    private void initGame() {
+        ValueEventListener roomEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                RoomModel room = dataSnapshot.getValue(RoomModel.class);
+                if (room.getProgress() == RoomProgress.GATHERED && room.getFirst().equals(mUserID)) {
+                    // ゲーム開始時に先行後攻を決める
+                    setFirstPlayer(room);
+                    room.setProgress(RoomProgress.PLAING);
+                    mRoomRef.setValue(room);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mRoomRef.addValueEventListener(roomEventListener);
+    }
+
+    private void setFirstPlayer(RoomModel room) {
+        String user1 = room.first;
+        String user2 = room.second;
+        Random rnd = new Random();
+        int ran = rnd.nextInt(10) + 1;
+        if (ran % 2 == 0) {
+            room.first = user1;
+            room.second = user2;
+        } else {
+            room.first = user2;
+            room.second = user1;
+        }
     }
 
     @Override

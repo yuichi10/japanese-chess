@@ -39,7 +39,7 @@ public class RoomModel {
     }
 
     public String getFirst() {
-        return first;
+        return this.first;
     }
 
     public void setFirst(String first) {
