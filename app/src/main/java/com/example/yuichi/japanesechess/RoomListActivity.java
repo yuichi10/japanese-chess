@@ -38,16 +38,17 @@ public class RoomListActivity extends AppCompatActivity {
         sharedEditor = sharedData.edit();
         setContentView(R.layout.room_list);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        roomListView = (ListView)findViewById(R.id.room_list_view);
-        //setRoomList();
+        roomListView = (ListView) findViewById(R.id.room_list_view);
+        // room listを表示
         setRoomListView();
+        // 新しくroomを作るview
         createNewRoom();
     }
 
     private void createNewRoom() {
-        Button createNewRoomButton = (Button)findViewById(R.id.create_new_room_button);
-        createNewRoomButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
+        Button createNewRoomButton = (Button) findViewById(R.id.create_new_room_button);
+        createNewRoomButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 DatabaseReference roomDatabase = mDatabase.child(getString(R.string.firebase_rooms)).push();
                 String roomID = roomDatabase.getKey();
                 String maker_id = sharedData.getString(getString(R.string.shared_data_device_id), "");
@@ -80,12 +81,12 @@ public class RoomListActivity extends AppCompatActivity {
             @Override
             protected void populateView(View v, RoomModel model, int position) {
                 DatabaseReference roomRef = getRef(position);
-                ((TextView)v.findViewById(android.R.id.text1)).setText(model.getMaker());
-                ((TextView)v.findViewById(android.R.id.text2)).setText(roomRef.getKey());
+                ((TextView) v.findViewById(android.R.id.text1)).setText(model.getMaker());
+                ((TextView) v.findViewById(android.R.id.text2)).setText(roomRef.getKey());
             }
         };
         roomListView.setAdapter(mAdapter);
-        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        roomListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -96,9 +97,23 @@ public class RoomListActivity extends AppCompatActivity {
         });
     }
 
+    private void removeRoom() {
+        String roomId = sharedData.getString(getString(R.string.shared_data_current_room), "");
+        if (roomId != "") {
+            mDatabase.child(getString(R.string.firebase_rooms)).child(roomId).removeValue();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        removeRoom();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mAdapter.cleanup();
+        removeRoom();
     }
 }
