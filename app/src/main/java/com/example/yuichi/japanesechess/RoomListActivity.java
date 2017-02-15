@@ -61,6 +61,7 @@ public class RoomListActivity extends AppCompatActivity {
                 roomDatabase.setValue(room);
                 sharedEditor.putString(getString(R.string.shared_data_current_room), roomID);
                 sharedEditor.apply();
+
                 Intent intent = new Intent(RoomListActivity.this, GameActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
