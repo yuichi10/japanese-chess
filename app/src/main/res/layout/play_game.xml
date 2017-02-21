@@ -28,13 +28,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:srcCompat="@mipmap/board"
-                android:id="@+id/imageView3" />
+                android:id="@+id/board_image_view" />
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:srcCompat="@mipmap/grid"
-                android:id="@+id/imageView4" />
+                android:id="@+id/grid_image_view" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/on_board_pieces_layout">
+
+            </RelativeLayout>
 
         </FrameLayout>
 
