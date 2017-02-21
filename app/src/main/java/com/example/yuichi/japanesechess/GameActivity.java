@@ -3,11 +3,16 @@ package com.example.yuichi.japanesechess;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +52,8 @@ public class GameActivity extends AppCompatActivity {
         }
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
         setBackAram();
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(mRoomID);
         initGame();
+        View linearLayoutView = findViewById(R.id.game_board_view_area);
     }
 
     private void initGame() {
@@ -144,5 +148,22 @@ public class GameActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    private class MyView extends View
+    {
+        public MyView(Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+
+            final Paint paint = new Paint();
+            paint.setColor(Color.CYAN);
+
+            // 四角形を描画
+            canvas.drawRect(20.f, 20.f, 60.f, 60.f, paint);
+        }
     }
 }
