@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomProgress;
@@ -56,6 +57,13 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 RoomModel room = dataSnapshot.getValue(RoomModel.class);
+                if (room == null) {
+                    Toast.makeText(GameActivity.this, "画面を終了または、相手がルームを抜けました。",
+                            Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+
+                }
                 if (room.getProgress() == RoomProgress.GATHERED && room.getFirst().equals(mUserID)) {
                     // ゲーム開始時に先行後攻を決める
                     setFirstPlayer(room);
@@ -71,6 +79,7 @@ public class GameActivity extends AppCompatActivity {
         };
         mRoomRef.addValueEventListener(roomEventListener);
     }
+
 
     private void setFirstPlayer(RoomModel room) {
         String user1 = room.first;
