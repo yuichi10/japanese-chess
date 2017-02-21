@@ -106,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                     signUp(userID);
                 } else {
                     sharedEditor.putString(getString(R.string.shared_data_username), user.username);
-                    sharedEditor.putString(getString(R.string.shared_data_device_id), userID);
+                    sharedEditor.putString(getString(R.string.shared_data_user_id), userID);
                     sharedEditor.apply();
                     Intent intent = new Intent(LoginActivity.this, RoomListActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

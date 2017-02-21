@@ -52,7 +52,7 @@ public class RoomListActivity extends AppCompatActivity {
             public void onClick(View v) {
                 DatabaseReference roomDatabase = mDatabase.child(getString(R.string.firebase_rooms)).push();
                 String roomID = roomDatabase.getKey();
-                String maker_id = sharedData.getString(getString(R.string.shared_data_device_id), "");
+                String maker_id = sharedData.getString(getString(R.string.shared_data_user_id), "");
                 String maker_name = sharedData.getString(getString(R.string.shared_data_username), "");
                 RoomModel room = new RoomModel(maker_name, maker_id, "");
                 if (room.maker == "") {
@@ -96,7 +96,7 @@ public class RoomListActivity extends AppCompatActivity {
                 if (room.getProgress() != RoomProgress.WAITING){
                     return;
                 }
-                String userID = sharedData.getString(getString(R.string.shared_data_device_id), "");
+                String userID = sharedData.getString(getString(R.string.shared_data_user_id), "");
                 // ローカルに自身が今いるルームIDを保存
                 sharedEditor.putString(getString(R.string.shared_data_current_room), ref.getKey());
                 sharedEditor.apply();

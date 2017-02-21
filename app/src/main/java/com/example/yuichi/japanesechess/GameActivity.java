@@ -39,7 +39,7 @@ public class GameActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         sharedData = getSharedPreferences(getString(R.string.shared_data), Context.MODE_PRIVATE);
         mRoomID = sharedData.getString(getString(R.string.shared_data_current_room), "");
-        mUserID = sharedData.getString(getString(R.string.shared_data_device_id), "");
+        mUserID = sharedData.getString(getString(R.string.shared_data_user_id), "");
         if (mRoomID == "" || mUserID == "") {
             finish();
             return;
