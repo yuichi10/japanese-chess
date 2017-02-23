@@ -80,8 +80,10 @@ public class GameActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
+        mExtraBoardWidth = mOnBoardPiecesLayout.getWidth() / 38;
         mBoardCellWidth = (mOnBoardPiecesLayout.getWidth() - mExtraBoardWidth * 2) / 9;
-        mBoardCellHeight = (mOnBoardPiecesLayout.getHeight() * 8 / 10 - mExtraBoardHeight * 2) / 9;
+        // 将棋盤 => height : side = 39 : 35
+        mBoardCellHeight = mBoardCellWidth * 39 / 35;
         initBoardView();
     }
 
@@ -195,13 +197,13 @@ public class GameActivity extends AppCompatActivity {
     private int getLeftMargin(int place) {
         // 駒の横のマージン調整
         int horizontal = place % 11;
-        return mBoardCellWidth * (horizontal - 1);
+        return mBoardCellWidth * (horizontal - 1) + mBoardCellWidth / 4;
     }
 
     private int getTopMargin(int place) {
         // 駒のたてのマージン調整
         int vertical = place / 11;
-        return mBoardCellHeight * (vertical - 1);
+        return mBoardCellHeight * (vertical - 1) + mBoardCellHeight / 2;
     }
 
     private void setMargin(int place) {
