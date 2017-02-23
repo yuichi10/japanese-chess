@@ -53,6 +53,12 @@ public class GameActivity extends AppCompatActivity {
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList;
     private int[] mBoardPieces = new int[121];
 
+    private int mBoardCellWidth = 0;
+    private int mBoardCellHeight = 0;
+    private int mExtraBoardWidth = 0;
+    private int mExtraBoardHeight = 0;
+    private int mUntilBoardHeight = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,13 +74,20 @@ public class GameActivity extends AppCompatActivity {
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
         setBackAram();
         initGame();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
+        mBoardCellWidth = (mOnBoardPiecesLayout.getWidth() - mExtraBoardWidth * 2) / 9;
+        mBoardCellHeight = (mOnBoardPiecesLayout.getHeight() * 8 / 10 - mExtraBoardHeight * 2) / 9;
         initBoardView();
     }
 
     private void initBoardView() {
         mPicesViewList = new HashMap<>();
         mLayoutParamsList = new HashMap<>();
-        mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
         initBoardStatus();
         initBoardImages();
     }
@@ -182,18 +195,18 @@ public class GameActivity extends AppCompatActivity {
     private int getLeftMargin(int place) {
         // 駒の横のマージン調整
         int horizontal = place % 11;
-        return 100 * horizontal;
+        return mBoardCellWidth * (horizontal - 1);
     }
 
     private int getTopMargin(int place) {
         // 駒のたてのマージン調整
         int vertical = place / 11;
-        return 150 * vertical;
+        return mBoardCellHeight * (vertical - 1);
     }
 
     private void setMargin(int place) {
         // 将棋の駒の場所を調整
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(100,150);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mBoardCellWidth,mBoardCellHeight);
         lp.leftMargin = getLeftMargin(place);
         lp.topMargin = getTopMargin(place);
         // 場所を保存
