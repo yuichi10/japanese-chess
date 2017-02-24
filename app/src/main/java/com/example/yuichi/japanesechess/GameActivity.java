@@ -171,6 +171,7 @@ public class GameActivity extends AppCompatActivity {
         String roomId = sharedData.getString(getString(R.string.shared_data_current_room), "");
         if (roomId != "") {
             mDatabase.child(getString(R.string.firebase_rooms)).child(roomId).removeValue();
+            mDatabase.child(getString(R.string.firebase_move)).child(roomId).removeValue();
         }
     }
 
