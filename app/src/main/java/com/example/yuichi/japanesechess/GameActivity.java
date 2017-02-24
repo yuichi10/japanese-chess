@@ -44,18 +44,18 @@ public class GameActivity extends AppCompatActivity {
     int OPP_PAWN=11, OPP_BISHOP=12, OPP_ROOK=13, OPP_LANCE=14, OPP_KNIGHT=15, OPP_SILVER=16, OPP_GOLD=17, OPP_KING=18;
     int NOT_TURN_DECIDED=-1, TURN_FIRST=0, TURN_SECOND=1;
 
-    private DatabaseReference mDatabase;
-    private SharedPreferences sharedData;
-    private AlertDialog.Builder mAlertDialog;
-    DatabaseReference mRoomRef;
-    private DatabaseReference mMoveRef;
-    private String mRoomID;
-    private String mUserID;
-    private RelativeLayout mOnBoardPiecesLayout;
-    private Map<Integer, ImageView> mPicesViewList;
-    private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList;
-    private int[] mBoardPieces = new int[121];
-    private int mOwnTurn = NOT_TURN_DECIDED;
+    private DatabaseReference mDatabase;        //database への接続
+    private SharedPreferences sharedData;       //cache データ
+    private AlertDialog.Builder mAlertDialog;   //アラートのダイアログ
+    DatabaseReference mRoomRef;     //room を参照するデータ
+    private DatabaseReference mMoveRef; //move を参照するデータ
+    private String mRoomID;     //自身のいるroomID
+    private String mUserID;     //自身のID
+    private RelativeLayout mOnBoardPiecesLayout;        //ボードを表示してるレイアウト
+    private Map<Integer, ImageView> mPicesViewList;     //場所の画像
+    private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList; //画像の場所大きさ
+    private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
+    private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンかどうか
 
     private int mBoardCellWidth = 0;
     private int mBoardCellHeight = 0;
