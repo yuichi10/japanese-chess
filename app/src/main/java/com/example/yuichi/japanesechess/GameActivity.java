@@ -42,6 +42,7 @@ public class GameActivity extends AppCompatActivity {
     int NOTHING=0, OUT_BOARD=99;
     int OWN_PAWN=1, OWN_BISHOP=2, OWN_ROOK=3, OWN_LANCE=4, OWN_KNIGHT=5, OWN_SILVER=6,  OWN_GOLD=7, OWN_KING=8;
     int OPP_PAWN=11, OPP_BISHOP=12, OPP_ROOK=13, OPP_LANCE=14, OPP_KNIGHT=15, OPP_SILVER=16, OPP_GOLD=17, OPP_KING=18;
+    int NOT_TURN_DECIDED=-1, TURN_FIRST=0, TURN_SECOND=1;
 
     private DatabaseReference mDatabase;
     private SharedPreferences sharedData;
@@ -54,6 +55,7 @@ public class GameActivity extends AppCompatActivity {
     private Map<Integer, ImageView> mPicesViewList;
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList;
     private int[] mBoardPieces = new int[121];
+    private int mOwnTurn = NOT_TURN_DECIDED;
 
     private int mBoardCellWidth = 0;
     private int mBoardCellHeight = 0;
@@ -108,6 +110,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initRoomData() {
+        // ルーム情報のデータ情報
         ValueEventListener roomEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -127,6 +130,12 @@ public class GameActivity extends AppCompatActivity {
                     // 初期値のmove modelを保存
                     MoveModel moveModel = new MoveModel();
                     mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(moveModel);
+                } else if (room.getProgress() == RoomProgress.PLAING && mOwnTurn == NOT_TURN_DECIDED) {
+                    if (room.getFirst().equals(mUserID)) {
+                        mOwnTurn = TURN_FIRST;
+                    } else {
+                        mOwnTurn = TURN_SECOND;
+                    }
                 }
             }
 
@@ -139,6 +148,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initMoveData() {
+        // 打ったデータのデータベースの取得
         mMoveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
         ValueEventListener moveEventListener = new ValueEventListener() {
             @Override
