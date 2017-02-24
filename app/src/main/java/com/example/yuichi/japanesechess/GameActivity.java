@@ -74,7 +74,7 @@ public class GameActivity extends AppCompatActivity {
         }
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
         setBackAram();
-        initGame();
+        initGameData();
     }
 
     @Override
@@ -101,7 +101,11 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void initGame() {
+    private void initGameData() {
+        initRoomData();
+    }
+
+    private void initRoomData() {
         ValueEventListener roomEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
