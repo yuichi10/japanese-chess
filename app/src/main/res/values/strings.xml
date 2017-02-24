@@ -4,6 +4,7 @@
     <!-- firebase -->
     <string name="firebase_users">users</string>
     <string name="firebase_rooms">rooms</string>
+    <string name="firebase_move">move</string>
 
     <!-- shared preferences -->
     <string name="shared_data">DataSave</string>

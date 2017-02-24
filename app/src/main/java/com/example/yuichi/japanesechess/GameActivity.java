@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.yuichi.japanesechess.firebasemodel.MoveModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomModel;
 import com.example.yuichi.japanesechess.firebasemodel.RoomProgress;
 import com.google.firebase.database.DataSnapshot;
@@ -117,6 +118,9 @@ public class GameActivity extends AppCompatActivity {
                     setFirstPlayer(room);
                     room.setProgress(RoomProgress.PLAING);
                     mRoomRef.setValue(room);
+                    // 初期値のmove modelを保存
+                    MoveModel moveModel = new MoveModel();
+                    mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(moveModel);
                 }
             }
 
