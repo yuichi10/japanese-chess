@@ -47,6 +47,7 @@ public class GameActivity extends AppCompatActivity {
     private SharedPreferences sharedData;
     private AlertDialog.Builder mAlertDialog;
     DatabaseReference mRoomRef;
+    private DatabaseReference mMoveRef;
     private String mRoomID;
     private String mUserID;
     private RelativeLayout mOnBoardPiecesLayout;
@@ -103,6 +104,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void initGameData() {
         initRoomData();
+        initMoveData();
     }
 
     private void initRoomData() {
@@ -134,6 +136,27 @@ public class GameActivity extends AppCompatActivity {
             }
         };
         mRoomRef.addValueEventListener(roomEventListener);
+    }
+
+    private void initMoveData() {
+        mMoveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
+        ValueEventListener moveEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MoveModel move = dataSnapshot.getValue(MoveModel.class);
+                if (move == null) {
+                    return;
+                }
+                Toast.makeText(GameActivity.this, "誰か打った。",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mMoveRef.addValueEventListener(moveEventListener);
     }
 
 
