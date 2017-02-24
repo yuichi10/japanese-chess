@@ -55,7 +55,8 @@ public class GameActivity extends AppCompatActivity {
     private Map<Integer, ImageView> mPicesViewList;     //場所の画像
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList; //画像の場所大きさ
     private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
-    private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンかどうか
+    private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンがどっちか
+    private boolean mIsMovable = false;             //自身のターンかどうか
 
     private int mBoardCellWidth = 0;
     private int mBoardCellHeight = 0;
@@ -157,8 +158,15 @@ public class GameActivity extends AppCompatActivity {
                 if (move == null) {
                     return;
                 }
-                Toast.makeText(GameActivity.this, "誰か打った。",
-                        Toast.LENGTH_SHORT).show();
+                if (move.getTurnNum() % 2 == mOwnTurn) {
+                    mIsMovable = true;
+                    Toast.makeText(GameActivity.this, "自分のターン",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    mIsMovable = false;
+                    Toast.makeText(GameActivity.this, "相手のターン",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
