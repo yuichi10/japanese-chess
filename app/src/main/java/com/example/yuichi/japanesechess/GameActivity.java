@@ -7,12 +7,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuAdapter;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,6 +54,7 @@ public class GameActivity extends AppCompatActivity {
     private String mRoomID;     //自身のいるroomID
     private String mUserID;     //自身のID
     private RelativeLayout mOnBoardPiecesLayout;        //ボードを表示してるレイアウト
+    private ImageView mBoardImageView;
     private Map<Integer, ImageView> mPicesViewList;     //場所の画像
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList; //画像の場所大きさ
     private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
@@ -85,8 +88,9 @@ public class GameActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
-        mExtraBoardWidth = mOnBoardPiecesLayout.getWidth() / 38;
-        mBoardCellWidth = (mOnBoardPiecesLayout.getWidth() - mExtraBoardWidth * 2) / 9;
+        mBoardImageView = (ImageView)findViewById(R.id.board_image_view);
+        mExtraBoardWidth = mBoardImageView.getWidth() / 38;
+        mBoardCellWidth = (mBoardImageView.getWidth() - mExtraBoardWidth * 2) / 9;
         // 将棋盤 => height : side = 39 : 35
         mBoardCellHeight = mBoardCellWidth * 39 / 35;
         initBoardView();
@@ -218,6 +222,16 @@ public class GameActivity extends AppCompatActivity {
 
     public void finishActivity() {
         finish();
+    }
+
+    private void getPlaceFromTouchPosition(float x, float y) {
+
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        Log.d("TouchEvent", "X:" + event.getX() + ",Y:" + event.getY());
+        return true;
     }
 
 
