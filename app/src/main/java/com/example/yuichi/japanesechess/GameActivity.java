@@ -9,9 +9,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuAdapter;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -41,9 +43,11 @@ import java.util.Random;
  */
 
 public class GameActivity extends AppCompatActivity {
+    // board の数字といみ
     int NOTHING=0, OUT_BOARD=99;
     int OWN_PAWN=1, OWN_BISHOP=2, OWN_ROOK=3, OWN_LANCE=4, OWN_KNIGHT=5, OWN_SILVER=6,  OWN_GOLD=7, OWN_KING=8;
     int OPP_PAWN=11, OPP_BISHOP=12, OPP_ROOK=13, OPP_LANCE=14, OPP_KNIGHT=15, OPP_SILVER=16, OPP_GOLD=17, OPP_KING=18;
+    // 自身のターン
     int NOT_TURN_DECIDED=-1, TURN_FIRST=0, TURN_SECOND=1;
 
     private DatabaseReference mDatabase;        //database への接続
@@ -55,17 +59,18 @@ public class GameActivity extends AppCompatActivity {
     private String mUserID;     //自身のID
     private RelativeLayout mOnBoardPiecesLayout;        //ボードを表示してるレイアウト
     private ImageView mBoardImageView;
+    private LinearLayout mBaseLayout;
     private Map<Integer, ImageView> mPicesViewList;     //場所の画像
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList; //画像の場所大きさ
     private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
     private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンがどっちか
     private boolean mIsMovable = false;             //自身のターンかどうか
 
-    private int mBoardCellWidth = 0;
-    private int mBoardCellHeight = 0;
-    private int mExtraBoardWidth = 0;
-    private int mExtraBoardHeight = 0;
-    private int mUntilBoardHeight = 0;
+    private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
+    private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
+    private int mExtraBoardWidth = 0;   //ボードの横のはみ出している部分(たても同じ長さ)
+    private int mDisplayWidth = 0;      //ディスプレイ本体のpixel
+    private int mDisplayHeight = 0;     //ディスプレイ本体の高さのpixel
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +92,12 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        mDisplayWidth = dm.widthPixels;
+        mDisplayHeight = dm.heightPixels;
         mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
+        mBaseLayout = (LinearLayout)findViewById(R.id.play_game_view_origin_layer);
         mBoardImageView = (ImageView)findViewById(R.id.board_image_view);
         mExtraBoardWidth = mBoardImageView.getWidth() / 38;
         mBoardCellWidth = (mBoardImageView.getWidth() - mExtraBoardWidth * 2) / 9;
@@ -224,13 +234,27 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
-    private void getPlaceFromTouchPosition(float x, float y) {
-
+    private int getPlaceFromTouchPosition(float x, float y) {
+        float diffDispBaseX = mDisplayWidth - mBaseLayout.getWidth();
+        float diffDispBaseY = mDisplayHeight - mBaseLayout.getHeight();
+        float diffX = (mBaseLayout.getWidth() - mBoardImageView.getWidth()) / 2;
+        float diffY = (mBaseLayout.getHeight() - mBoardImageView.getHeight()) / 2;
+        int xPos = 0;
+        int yPos = 0;
+        if (x >= diffX + diffDispBaseX && x <= diffX + mBoardImageView.getWidth() + diffDispBaseX) {
+            xPos = (int)((x-diffX) / mBoardCellWidth) + 1;
+        }
+        if (y >= diffY + diffDispBaseY && y <= diffY + mBoardImageView.getHeight() + diffDispBaseY) {
+            yPos = (int)((y-diffY) / mBoardCellHeight) - 1;
+        }
+        int pos = xPos + yPos * 11;
+        return pos;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d("TouchEvent", "X:" + event.getX() + ",Y:" + event.getY());
+        int touchPos = getPlaceFromTouchPosition(event.getX(),  event.getY());
         return true;
     }
 
