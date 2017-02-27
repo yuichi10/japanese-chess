@@ -65,6 +65,8 @@ public class GameActivity extends AppCompatActivity {
     private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
     private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンがどっちか
     private boolean mIsMovable = false;             //自身のターンかどうか
+    private int mChoosedPlace = 0;              //動かす駒が選択されたかどうか
+    private MoveModel mMoveModel = null;
 
     private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
     private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
@@ -162,22 +164,32 @@ public class GameActivity extends AppCompatActivity {
         mRoomRef.addValueEventListener(roomEventListener);
     }
 
+    private int convertOppToOwn(int place) {
+        return 120 - place;
+    }
+
     private void initMoveData() {
         // 打ったデータのデータベースの取得
         mMoveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
         ValueEventListener moveEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                MoveModel move = dataSnapshot.getValue(MoveModel.class);
-                if (move == null) {
+                mMoveModel = dataSnapshot.getValue(MoveModel.class);
+                if (mMoveModel == null) {
                     return;
                 }
-                if (move.getTurnNum() % 2 == mOwnTurn) {
+                if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
+                    // TODO(yuichi): 2017/02/27 相手の場所を設定する。
+                    if (mMoveModel.getTurnNum() != 0){
+                        setMoveImaegs(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind());
+                    }
                     mIsMovable = true;
+                    mChoosedPlace = NOTHING;
                     Toast.makeText(GameActivity.this, "自分のターン",
                             Toast.LENGTH_SHORT).show();
                 } else {
                     mIsMovable = false;
+                    mChoosedPlace = NOTHING;
                     Toast.makeText(GameActivity.this, "相手のターン",
                             Toast.LENGTH_SHORT).show();
                 }
@@ -234,6 +246,17 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
+    private void setMoveImaegs(int pastPos, int postPos, int kind) {
+        // 過去の画像を削除
+        mBoardPieces[pastPos] = 0;
+        mOnBoardPiecesLayout.removeView( mPicesViewList.get(pastPos));
+        mLayoutParamsList.remove(pastPos);
+        //新しい画像表示
+        mBoardPieces[postPos] = kind;
+        setOnBoardPieceView (postPos);
+
+    }
+
     private int getPlaceFromTouchPosition(float x, float y) {
         float diffDispBaseX = mDisplayWidth - mBaseLayout.getWidth();
         float diffDispBaseY = mDisplayHeight - mBaseLayout.getHeight();
@@ -251,10 +274,28 @@ public class GameActivity extends AppCompatActivity {
         return pos;
     }
 
+    private void movePiece(int place) {
+        // todo(yuichi): 将棋を動かす
+        if (mIsMovable) {
+            if (mBoardPieces[place] > 0 && mBoardPieces[place] < 9) {
+                mChoosedPlace = place;
+            } else if (mBoardPieces[place] == 0 && mChoosedPlace != 0) {
+                int currentTurn = mMoveModel.getTurnNum();
+                mMoveModel.setTurnNum(currentTurn + 1);
+                mMoveModel.setPastPos(mChoosedPlace);
+                mMoveModel.setPostPos(place);
+                mMoveModel.setKind(mBoardPieces[mChoosedPlace]);
+                mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(mMoveModel);
+                setMoveImaegs(mChoosedPlace, place, mBoardPieces[mChoosedPlace]);
+            }
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d("TouchEvent", "X:" + event.getX() + ",Y:" + event.getY());
         int touchPos = getPlaceFromTouchPosition(event.getX(),  event.getY());
+        movePiece(touchPos);
         return true;
     }
 
