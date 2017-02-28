@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -181,7 +182,7 @@ public class GameActivity extends AppCompatActivity {
                 if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
                     // TODO(yuichi): 2017/02/27 相手の場所を設定する。
                     if (mMoveModel.getTurnNum() != 0){
-                        setMoveImaegs(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind());
+                        setMoveImaegs(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
                     }
                     mIsMovable = true;
                     mChoosedPlace = NOTHING;
@@ -249,8 +250,9 @@ public class GameActivity extends AppCompatActivity {
     private void setMoveImaegs(int pastPos, int postPos, int kind) {
         // 過去の画像を削除
         mBoardPieces[pastPos] = 0;
-        mOnBoardPiecesLayout.removeView( mPicesViewList.get(pastPos));
         mLayoutParamsList.remove(pastPos);
+        mOnBoardPiecesLayout.removeView(mPicesViewList.get(pastPos));
+        mPicesViewList.remove(pastPos);
         //新しい画像表示
         mBoardPieces[postPos] = kind;
         setOnBoardPieceView (postPos);
