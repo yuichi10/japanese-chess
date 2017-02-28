@@ -36,10 +36,6 @@ import java.util.Random;
  */
 
 public class GameActivity extends AppCompatActivity {
-    // board の数字といみ
-    int NOTHING = 0, OUT_BOARD = 99;
-    int OWN_PAWN = 1, OWN_BISHOP = 2, OWN_ROOK = 3, OWN_LANCE = 4, OWN_KNIGHT = 5, OWN_SILVER = 6, OWN_GOLD = 7, OWN_KING = 8;
-    int OPP_PAWN = 11, OPP_BISHOP = 12, OPP_ROOK = 13, OPP_LANCE = 14, OPP_KNIGHT = 15, OPP_SILVER = 16, OPP_GOLD = 17, OPP_KING = 18;
     // 自身のターン
     int NOT_TURN_DECIDED = -1, TURN_FIRST = 0, TURN_SECOND = 1;
 
@@ -175,12 +171,12 @@ public class GameActivity extends AppCompatActivity {
                         setMoveImages(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
                     }
                     mIsMovable = true;
-                    mChosePlace = NOTHING;
+                    mChosePlace = PiecesID.NOTHING.getId();
                     Toast.makeText(GameActivity.this, "自分のターン",
                             Toast.LENGTH_SHORT).show();
                 } else {
                     mIsMovable = false;
-                    mChosePlace = NOTHING;
+                    mChosePlace = PiecesID.NOTHING.getId();
                     Toast.makeText(GameActivity.this, "相手のターン",
                             Toast.LENGTH_SHORT).show();
                 }
@@ -501,75 +497,75 @@ public class GameActivity extends AppCompatActivity {
     private void initBoardStatus() {
         for (int i = 0; i < 121; i++) {
             if (i < 11) {
-                mBoardPieces[i] = OUT_BOARD;
+                mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
             } else if (i < 22) {
                 if (i == 11 || i == 21) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else if (i == 12 || i == 20) {
-                    mBoardPieces[i] = OPP_LANCE;
+                    mBoardPieces[i] = PiecesID.OPP_LANCE.getId();
                 } else if (i == 13 || i == 19) {
-                    mBoardPieces[i] = OPP_KNIGHT;
+                    mBoardPieces[i] = PiecesID.OPP_KNIGHT.getId();
                 } else if (i == 14 || i == 18) {
-                    mBoardPieces[i] = OPP_SILVER;
+                    mBoardPieces[i] = PiecesID.OPP_SILVER.getId();
                 } else if (i == 15 || i == 17) {
-                    mBoardPieces[i] = OPP_GOLD;
+                    mBoardPieces[i] = PiecesID.OPP_GOLD.getId();
                 } else if (i == 16) {
-                    mBoardPieces[i] = OPP_KING;
+                    mBoardPieces[i] = PiecesID.OPP_KING.getId();
                 }
             } else if (i < 33) {
                 if (i == 24) {
-                    mBoardPieces[i] = OPP_ROOK;
+                    mBoardPieces[i] = PiecesID.OPP_ROOK.getId();
                 } else if (i == 30) {
-                    mBoardPieces[i] = OPP_BISHOP;
+                    mBoardPieces[i] = PiecesID.OPP_BISHOP.getId();
                 } else if (i == 22 || i == 32) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else {
-                    mBoardPieces[i] = NOTHING;
+                    mBoardPieces[i] = PiecesID.NOTHING.getId();
                 }
             } else if (i < 44) {
                 if (i == 33 || i == 43) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else {
-                    mBoardPieces[i] = OPP_PAWN;
+                    mBoardPieces[i] = PiecesID.OPP_PAWN.getId();
                 }
             } else if (i < 77) {
                 if (i % 11 == 0 || (i + 1) % 11 == 0) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else {
-                    mBoardPieces[i] = NOTHING;
+                    mBoardPieces[i] = PiecesID.NOTHING.getId();
                 }
             } else if (i < 88) {
                 if (i == 77 || i == 87) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else {
-                    mBoardPieces[i] = OWN_PAWN;
+                    mBoardPieces[i] = PiecesID.OWN_PAWN.getId();
                 }
             } else if (i < 99) {
                 if (i == 90) {
-                    mBoardPieces[i] = OWN_BISHOP;
+                    mBoardPieces[i] = PiecesID.OWN_BISHOP.getId();
                 } else if (i == 96) {
-                    mBoardPieces[i] = OWN_ROOK;
+                    mBoardPieces[i] = PiecesID.OWN_ROOK.getId();
                 } else if (i == 88 || i == 98) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else {
-                    mBoardPieces[i] = NOTHING;
+                    mBoardPieces[i] = PiecesID.NOTHING.getId();
                 }
             } else if (i < 110) {
                 if (i == 99 || i == 109) {
-                    mBoardPieces[i] = OUT_BOARD;
+                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
                 } else if (i == 100 || i == 108) {
-                    mBoardPieces[i] = OWN_LANCE;
+                    mBoardPieces[i] = PiecesID.OWN_LANCE.getId();
                 } else if (i == 101 || i == 107) {
-                    mBoardPieces[i] = OWN_KNIGHT;
+                    mBoardPieces[i] = PiecesID.OWN_KNIGHT.getId();
                 } else if (i == 102 || i == 106) {
-                    mBoardPieces[i] = OWN_SILVER;
+                    mBoardPieces[i] = PiecesID.OWN_SILVER.getId();
                 } else if (i == 103 || i == 105) {
-                    mBoardPieces[i] = OWN_GOLD;
+                    mBoardPieces[i] = PiecesID.OWN_GOLD.getId();
                 } else if (i == 104) {
-                    mBoardPieces[i] = OWN_KING;
+                    mBoardPieces[i] = PiecesID.OWN_KING.getId();
                 }
             } else {
-                mBoardPieces[i] = OUT_BOARD;
+                mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
             }
         }
     }
