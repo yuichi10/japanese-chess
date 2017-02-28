@@ -31,17 +31,17 @@ import java.util.Random;
 
 /**
  * Created by yuichi on 2017/02/03.
- *
+ * <p>
  * Try to make Japanese chess by using Firebase
  */
 
 public class GameActivity extends AppCompatActivity {
     // board の数字といみ
-    int NOTHING=0, OUT_BOARD=99;
-    int OWN_PAWN=1, OWN_BISHOP=2, OWN_ROOK=3, OWN_LANCE=4, OWN_KNIGHT=5, OWN_SILVER=6,  OWN_GOLD=7, OWN_KING=8;
-    int OPP_PAWN=11, OPP_BISHOP=12, OPP_ROOK=13, OPP_LANCE=14, OPP_KNIGHT=15, OPP_SILVER=16, OPP_GOLD=17, OPP_KING=18;
+    int NOTHING = 0, OUT_BOARD = 99;
+    int OWN_PAWN = 1, OWN_BISHOP = 2, OWN_ROOK = 3, OWN_LANCE = 4, OWN_KNIGHT = 5, OWN_SILVER = 6, OWN_GOLD = 7, OWN_KING = 8;
+    int OPP_PAWN = 11, OPP_BISHOP = 12, OPP_ROOK = 13, OPP_LANCE = 14, OPP_KNIGHT = 15, OPP_SILVER = 16, OPP_GOLD = 17, OPP_KING = 18;
     // 自身のターン
-    int NOT_TURN_DECIDED=-1, TURN_FIRST=0, TURN_SECOND=1;
+    int NOT_TURN_DECIDED = -1, TURN_FIRST = 0, TURN_SECOND = 1;
 
     private DatabaseReference mDatabase;        //database への接続
     private SharedPreferences sharedData;       //cache データ
@@ -91,9 +91,9 @@ public class GameActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         mDisplayWidth = dm.widthPixels;
         mDisplayHeight = dm.heightPixels;
-        mOnBoardPiecesLayout = (RelativeLayout)findViewById(R.id.on_board_pieces_layout);
-        mBaseLayout = (LinearLayout)findViewById(R.id.play_game_view_origin_layer);
-        mBoardImageView = (ImageView)findViewById(R.id.board_image_view);
+        mOnBoardPiecesLayout = (RelativeLayout) findViewById(R.id.on_board_pieces_layout);
+        mBaseLayout = (LinearLayout) findViewById(R.id.play_game_view_origin_layer);
+        mBoardImageView = (ImageView) findViewById(R.id.board_image_view);
         mExtraBoardWidth = mBoardImageView.getWidth() / 38;
         mBoardCellWidth = (mBoardImageView.getWidth() - mExtraBoardWidth * 2) / 9;
         // 将棋盤 => height : side = 39 : 35
@@ -173,7 +173,7 @@ public class GameActivity extends AppCompatActivity {
                 }
                 if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
                     // TODO(yuichi): 2017/02/27 相手の場所を設定する。
-                    if (mMoveModel.getTurnNum() != 0){
+                    if (mMoveModel.getTurnNum() != 0) {
                         setMoveImages(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
                     }
                     mIsMovable = true;
@@ -196,49 +196,6 @@ public class GameActivity extends AppCompatActivity {
         mMoveRef.addValueEventListener(moveEventListener);
     }
 
-
-    private void setFirstPlayer(RoomModel room) {
-        String user1 = room.first;
-        String user2 = room.second;
-        Random rnd = new Random();
-        int ran = rnd.nextInt(10) + 1;
-        if (ran % 2 == 0) {
-            room.first = user1;
-            room.second = user2;
-        } else {
-            room.first = user2;
-            room.second = user1;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        removeRoom();
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            // 戻るボタンの処理
-            mAlertDialog.create().show();
-            return true;
-        }
-        return false;
-    }
-
-    private void removeRoom() {
-        String roomId = sharedData.getString(getString(R.string.shared_data_current_room), "");
-        if (!roomId.equals("")) {
-            mDatabase.child(getString(R.string.firebase_rooms)).child(roomId).removeValue();
-            mDatabase.child(getString(R.string.firebase_move)).child(roomId).removeValue();
-        }
-    }
-
-    public void finishActivity() {
-        finish();
-    }
-
     private void setMoveImages(int pastPos, int postPos, int kind) {
         // 過去の画像を削除
         mBoardPieces[pastPos] = 0;
@@ -247,7 +204,7 @@ public class GameActivity extends AppCompatActivity {
         mPiecesViewList.remove(pastPos);
         //新しい画像表示
         mBoardPieces[postPos] = kind;
-        setOnBoardPieceView (postPos);
+        setOnBoardPieceView(postPos);
 
     }
 
@@ -259,10 +216,10 @@ public class GameActivity extends AppCompatActivity {
         int xPos = 0;
         int yPos = 0;
         if (x >= diffX + diffDispBaseX && x <= diffX + mBoardImageView.getWidth() + diffDispBaseX) {
-            xPos = (int)((x-diffX) / mBoardCellWidth) + 1;
+            xPos = (int) ((x - diffX) / mBoardCellWidth) + 1;
         }
         if (y >= diffY + diffDispBaseY && y <= diffY + mBoardImageView.getHeight() + diffDispBaseY) {
-            yPos = (int)((y-diffY) / mBoardCellHeight) - 1;
+            yPos = (int) ((y - diffY) / mBoardCellHeight) - 1;
         }
         return xPos + yPos * 11;
     }
@@ -287,7 +244,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Log.d("TouchEvent", "X:" + event.getX() + ",Y:" + event.getY());
-        int touchPos = getPlaceFromTouchPosition(event.getX(),  event.getY());
+        int touchPos = getPlaceFromTouchPosition(event.getX(), event.getY());
         movePiece(touchPos);
         return true;
     }
@@ -330,7 +287,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void setMargin(int place) {
         // 将棋の駒の場所を調整
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mBoardCellWidth,mBoardCellHeight);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mBoardCellWidth, mBoardCellHeight);
         lp.leftMargin = getLeftMargin(place);
         lp.topMargin = getTopMargin(place);
         // 場所を保存
@@ -343,7 +300,7 @@ public class GameActivity extends AppCompatActivity {
             case 1:
                 // 画像をセット
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own01));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own01));
                 // 画像を保存
                 mPiecesViewList.put(place, image);
                 setMargin(place);
@@ -351,189 +308,189 @@ public class GameActivity extends AppCompatActivity {
                 break;
             case 2:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own02));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own02));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 3:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own03));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own03));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 4:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own04));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own04));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 5:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own05));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own05));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 6:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own06));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own06));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 7:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own07));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own07));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 8:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own08));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own08));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 11:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp01));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp01));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 12:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp02));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp02));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 13:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp03));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp03));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 14:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp04));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp04));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 15:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp05));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp05));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 16:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp06));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp06));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 17:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp07));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp07));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case 18:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp08));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp08));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -1:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own09));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own09));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -2:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own10));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own10));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -3:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own11));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own11));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -4:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own12));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own12));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -5:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own13));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own13));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -6:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.own14));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.own14));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -11:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp09));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp09));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -12:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp10));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp10));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -13:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp11));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp11));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -14:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp12));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp12));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -15:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp13));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp13));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
                 break;
             case -16:
                 image = new ImageView(this);
-                image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.opp14));
+                image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.opp14));
                 mPiecesViewList.put(place, image);
                 setMargin(place);
                 mOnBoardPiecesLayout.addView(image, mLayoutParamsList.get(place));
@@ -544,7 +501,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initBoardStatus() {
-        for (int i=0; i < 121; i++) {
+        for (int i = 0; i < 121; i++) {
             if (i < 11) {
                 mBoardPieces[i] = OUT_BOARD;
             } else if (i < 22) {
@@ -558,7 +515,7 @@ public class GameActivity extends AppCompatActivity {
                     mBoardPieces[i] = OPP_SILVER;
                 } else if (i == 15 || i == 17) {
                     mBoardPieces[i] = OPP_GOLD;
-                } else if (i == 16 ) {
+                } else if (i == 16) {
                     mBoardPieces[i] = OPP_KING;
                 }
             } else if (i < 33) {
@@ -578,7 +535,7 @@ public class GameActivity extends AppCompatActivity {
                     mBoardPieces[i] = OPP_PAWN;
                 }
             } else if (i < 77) {
-                if (i % 11 == 0 || (i+1) % 11 == 0) {
+                if (i % 11 == 0 || (i + 1) % 11 == 0) {
                     mBoardPieces[i] = OUT_BOARD;
                 } else {
                     mBoardPieces[i] = NOTHING;
@@ -617,5 +574,47 @@ public class GameActivity extends AppCompatActivity {
                 mBoardPieces[i] = OUT_BOARD;
             }
         }
+    }
+
+    private void setFirstPlayer(RoomModel room) {
+        String user1 = room.first;
+        String user2 = room.second;
+        Random rnd = new Random();
+        int ran = rnd.nextInt(10) + 1;
+        if (ran % 2 == 0) {
+            room.first = user1;
+            room.second = user2;
+        } else {
+            room.first = user2;
+            room.second = user1;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeRoom();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンの処理
+            mAlertDialog.create().show();
+            return true;
+        }
+        return false;
+    }
+
+    private void removeRoom() {
+        String roomId = sharedData.getString(getString(R.string.shared_data_current_room), "");
+        if (!roomId.equals("")) {
+            mDatabase.child(getString(R.string.firebase_rooms)).child(roomId).removeValue();
+            mDatabase.child(getString(R.string.firebase_move)).child(roomId).removeValue();
+        }
+    }
+
+    public void finishActivity() {
+        finish();
     }
 }
