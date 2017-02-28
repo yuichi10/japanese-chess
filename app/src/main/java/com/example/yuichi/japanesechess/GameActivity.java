@@ -47,7 +47,6 @@ public class GameActivity extends AppCompatActivity {
     private SharedPreferences sharedData;       //cache データ
     private AlertDialog.Builder mAlertDialog;   //アラートのダイアログ
     DatabaseReference mRoomRef;     //room を参照するデータ
-    private DatabaseReference mMoveRef; //move を参照するデータ
     private String mRoomID;     //自身のいるroomID
     private String mUserID;     //自身のID
     private RelativeLayout mOnBoardPiecesLayout;        //ボードを表示してるレイアウト
@@ -63,7 +62,6 @@ public class GameActivity extends AppCompatActivity {
 
     private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
     private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
-    private int mExtraBoardWidth = 0;   //ボードの横のはみ出している部分(たても同じ長さ)
     private int mDisplayWidth = 0;      //ディスプレイ本体のpixel
     private int mDisplayHeight = 0;     //ディスプレイ本体の高さのpixel
 
@@ -80,7 +78,7 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
-        setBackAram();
+        setBackAlarm();
         initGameData();
     }
 
@@ -94,8 +92,8 @@ public class GameActivity extends AppCompatActivity {
         mOnBoardPiecesLayout = (RelativeLayout) findViewById(R.id.on_board_pieces_layout);
         mBaseLayout = (LinearLayout) findViewById(R.id.play_game_view_origin_layer);
         mBoardImageView = (ImageView) findViewById(R.id.board_image_view);
-        mExtraBoardWidth = mBoardImageView.getWidth() / 38;
-        mBoardCellWidth = (mBoardImageView.getWidth() - mExtraBoardWidth * 2) / 9;
+        int extraBoardWidth = mBoardImageView.getWidth() / 38;
+        mBoardCellWidth = (mBoardImageView.getWidth() - extraBoardWidth * 2) / 9;
         // 将棋盤 => height : side = 39 : 35
         mBoardCellHeight = mBoardCellWidth * 39 / 35;
         initBoardView();
@@ -163,7 +161,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void initMoveData() {
         // 打ったデータのデータベースの取得
-        mMoveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
+        DatabaseReference moveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
         ValueEventListener moveEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -172,8 +170,8 @@ public class GameActivity extends AppCompatActivity {
                     return;
                 }
                 if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
-                    // TODO(yuichi): 2017/02/27 相手の場所を設定する。
                     if (mMoveModel.getTurnNum() != 0) {
+                        // 相手の駒を自身の画面に反映
                         setMoveImages(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
                     }
                     mIsMovable = true;
@@ -193,7 +191,7 @@ public class GameActivity extends AppCompatActivity {
 
             }
         };
-        mMoveRef.addValueEventListener(moveEventListener);
+        moveRef.addValueEventListener(moveEventListener);
     }
 
     private void setMoveImages(int pastPos, int postPos, int kind) {
@@ -225,7 +223,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void movePiece(int place) {
-        // todo(yuichi): 将棋を動かす
+        // 駒を動かす
         if (mIsMovable) {
             if (mBoardPieces[place] > 0 && mBoardPieces[place] < 9) {
                 mChosePlace = place;
@@ -250,7 +248,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
 
-    private void setBackAram() {
+    private void setBackAlarm() {
         mAlertDialog = new AlertDialog.Builder(this);
         mAlertDialog.setTitle("本当に終了しますか?");
         mAlertDialog.setMessage("この画面から離れるとゲームが終了します");
