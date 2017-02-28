@@ -251,7 +251,7 @@ public class GameActivity extends AppCompatActivity {
         // 過去の画像を削除
         mBoardPieces[pastPos] = 0;
         mLayoutParamsList.remove(pastPos);
-        mOnBoardPiecesLayout.removeView(mPicesViewList.get(pastPos));
+        mOnBoardPiecesLayout.removeViewInLayout(mPicesViewList.get(pastPos));
         mPicesViewList.remove(pastPos);
         //新しい画像表示
         mBoardPieces[postPos] = kind;
