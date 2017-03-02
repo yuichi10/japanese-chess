@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -62,8 +64,9 @@ public class GameActivity extends AppCompatActivity {
     private TextView mWhichTurnTextView;    // どっちのターンか表示
     private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
 
-    private Map<Integer, Integer> mOppInHandPieces; // key: piece id, value: num
-    private Map<Integer, Integer> mOwnInHandPieces; // key: piece id, value: num
+    private Map<Integer, Integer> mInHandPieces; // key: piece id, value: num
+    private Map<Integer, ImageButton> mInHandImageButtons;   // 持ち駒ボタン
+    private Map<Integer, TextView> mInHandNumTextView;       // 持ち側の数
 
     private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
     private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
@@ -108,15 +111,46 @@ public class GameActivity extends AppCompatActivity {
 
     private void initInHandData() {
         // 自分の持ち駒の初期化
-        mOppInHandPieces = new HashMap<>();
-        mOwnInHandPieces = new HashMap<>();
+        mInHandPieces = new HashMap<>();
+        mInHandImageButtons = new HashMap<>();
+        mInHandNumTextView = new HashMap<>();
         for (PiecesID pieceID : PiecesID.values()) {
             if (isOwnPiece(pieceID.getId())){
-                mOwnInHandPieces.put(pieceID.getId(), 0);
+                mInHandPieces.put(pieceID.getId(), 0);
             } else if (isOppPiece(pieceID.getId())) {
-                mOppInHandPieces.put(pieceID.getId(), 0);
+                mInHandPieces.put(pieceID.getId(), 0);
             }
         }
+        ImageButton image = (ImageButton)findViewById(R.id.inHand_own_pawn_button);
+        mInHandImageButtons.put(PiecesID.OWN_PAWN.getId(), (ImageButton)findViewById(R.id.inHand_own_pawn_button));
+        mInHandImageButtons.put(PiecesID.OWN_LANCE.getId(), (ImageButton)findViewById(R.id.inHand_own_lance_button));
+        mInHandImageButtons.put(PiecesID.OWN_KNIGHT.getId(), (ImageButton)findViewById(R.id.inHand_own_knight_button));
+        mInHandImageButtons.put(PiecesID.OWN_SILVER.getId(), (ImageButton)findViewById(R.id.inHand_own_silver_button));
+        mInHandImageButtons.put(PiecesID.OWN_GOLD.getId(), (ImageButton)findViewById(R.id.inHand_own_gold_button));
+        mInHandImageButtons.put(PiecesID.OWN_BISHOP.getId(), (ImageButton)findViewById(R.id.inHand_own_bishop_button));
+        mInHandImageButtons.put(PiecesID.OWN_ROOK.getId(), (ImageButton)findViewById(R.id.inHand_own_rook_button));
+        mInHandImageButtons.put(PiecesID.OPP_PAWN.getId(), (ImageButton)findViewById(R.id.inHand_opp_pawn_button));
+        mInHandImageButtons.put(PiecesID.OPP_LANCE.getId(), (ImageButton)findViewById(R.id.inHand_opp_lance_button));
+        mInHandImageButtons.put(PiecesID.OPP_KNIGHT.getId(), (ImageButton)findViewById(R.id.inHand_opp_knight_button));
+        mInHandImageButtons.put(PiecesID.OPP_SILVER.getId(), (ImageButton)findViewById(R.id.inHand_opp_silver_button));
+        mInHandImageButtons.put(PiecesID.OPP_GOLD.getId(), (ImageButton)findViewById(R.id.inHand_opp_gold_button));
+        mInHandImageButtons.put(PiecesID.OPP_BISHOP.getId(), (ImageButton)findViewById(R.id.inHand_opp_bishop_button));
+        mInHandImageButtons.put(PiecesID.OPP_ROOK.getId(), (ImageButton)findViewById(R.id.inHand_opp_rook_button));
+
+        mInHandNumTextView.put(PiecesID.OWN_PAWN.getId(), (TextView)findViewById(R.id.inHand_own_pawn_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_LANCE.getId(), (TextView)findViewById(R.id.inHand_own_lance_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_KNIGHT.getId(), (TextView)findViewById(R.id.inHand_own_knight_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_SILVER.getId(), (TextView)findViewById(R.id.inHand_own_silver_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_GOLD.getId(), (TextView)findViewById(R.id.inHand_own_gold_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_BISHOP.getId(), (TextView)findViewById(R.id.inHand_own_bishop_num_text_view));
+        mInHandNumTextView.put(PiecesID.OWN_ROOK.getId(), (TextView)findViewById(R.id.inHand_own_rook_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_PAWN.getId(), (TextView)findViewById(R.id.inHand_opp_pawn_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_LANCE.getId(), (TextView)findViewById(R.id.inHand_opp_lance_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_KNIGHT.getId(), (TextView)findViewById(R.id.inHand_opp_knight_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_SILVER.getId(), (TextView)findViewById(R.id.inHand_opp_silver_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_GOLD.getId(), (TextView)findViewById(R.id.inHand_opp_gold_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_BISHOP.getId(), (TextView)findViewById(R.id.inHand_opp_bishop_num_text_view));
+        mInHandNumTextView.put(PiecesID.OPP_ROOK.getId(), (TextView)findViewById(R.id.inHand_opp_rook_num_text_view));
     }
 
     private void initGameInfoTextView() {
@@ -267,14 +301,21 @@ public class GameActivity extends AppCompatActivity {
         return kind;
     }
 
+    private void setInHandNum(int kind) {
+        TextView textView = mInHandNumTextView.get(kind);
+        textView.setText("x" + mInHandPieces.get(kind));
+    }
+
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
         if (isOppPiece(takePieceKind)) {
-            int curNum = mOwnInHandPieces.get(swapOwnAndOppKind(takePieceKind));
-            mOwnInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+            int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
+            mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+            setInHandNum(swapOwnAndOppKind(takePieceKind));
         } else if (isOwnPiece(takePieceKind)) {
-            int curNum = mOppInHandPieces.get(swapOwnAndOppKind(takePieceKind));
-            mOppInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+            int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
+            mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+            setInHandNum(swapOwnAndOppKind(takePieceKind));
         }
     }
 

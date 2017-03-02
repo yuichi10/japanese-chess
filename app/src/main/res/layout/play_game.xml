@@ -104,7 +104,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:srcCompat="@mipmap/opp06"
-                    android:id="@+id/inHand_opp_sliver_button" />
+                    android:id="@+id/inHand_opp_silver_button" />
 
                 <TextView
                     android:text="x0"
@@ -254,7 +254,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_lance_num_text_view" />
+                    android:id="@+id/inHand_own_lance_num_text_view" />
             </FrameLayout>
 
             <FrameLayout
@@ -272,7 +272,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_knight_num_text_view" />
+                    android:id="@+id/inHand_own_knight_num_text_view" />
             </FrameLayout>
 
             <FrameLayout
@@ -290,7 +290,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_silver_num_text_view" />
+                    android:id="@+id/inHand_own_silver_num_text_view" />
             </FrameLayout>
 
             <FrameLayout
@@ -308,7 +308,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_gold_num_text_view" />
+                    android:id="@+id/inHand_own_gold_num_text_view" />
             </FrameLayout>
 
             <FrameLayout
@@ -326,7 +326,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_bishop_num_text_view" />
+                    android:id="@+id/inHand_own_bishop_num_text_view" />
             </FrameLayout>
 
             <FrameLayout
@@ -344,7 +344,7 @@
                     android:text="x0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/inHand_opp_rook_num_text_view"
+                    android:id="@+id/inHand_own_rook_num_text_view"
                     android:layout_weight="1" />
             </FrameLayout>
         </LinearLayout>
