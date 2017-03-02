@@ -164,15 +164,27 @@ public class GameActivity extends AppCompatActivity {
         mRoomRef.addValueEventListener(roomEventListener);
     }
 
-    private int convertOppToOwn(int place) {
+    private int convertOppToOwnViewPlace(int place) {
         return 120 - place;
     }
 
     private void setWhichTurnInfo(int turn) {
+        // どっちのターンか表示
         if (turn % 2 == mOwnTurn) {
             mWhichTurnTextView.setText("あなたの番");
         } else {
             mWhichTurnTextView.setText("相手の番");
+        }
+    }
+
+    private void setWhereOppMoveInfo(MoveModel move) {
+        // 相手がどこに打ったか表示
+        if (move.getTurnNum() % 2 == mOwnTurn) {
+            int pos = convertOppToOwnViewPlace(move.getPostPos());
+            String kind = getPieceName(move.getKind());
+            int ypos = pos / 11;
+            int xpos = pos % 11;
+            mWhereOppMoveTextView.setText(xpos + ":" + ypos + " " + kind);
         }
     }
 
@@ -189,7 +201,7 @@ public class GameActivity extends AppCompatActivity {
                 if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
-                        setMoveImages(convertOppToOwn(mMoveModel.getPastPos()), convertOppToOwn(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
+                        setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
                     }
                     mIsMovable = true;
                     mChosePlace = PiecesID.NOTHING.getId();
@@ -202,6 +214,7 @@ public class GameActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                 }
                 setWhichTurnInfo(mMoveModel.getTurnNum());
+                setWhereOppMoveInfo(mMoveModel);
             }
 
             @Override
@@ -514,6 +527,27 @@ public class GameActivity extends AppCompatActivity {
             default:
                 break;
         }
+    }
+
+    private String getPieceName(int kind) {
+        if (kind == PiecesID.OWN_PAWN.getId()) {
+            return "歩";
+        } else if (kind == PiecesID.OWN_LANCE.getId()) {
+            return "槍";
+        } else if (kind == PiecesID.OWN_KNIGHT.getId()) {
+            return "馬";
+        } else if (kind == PiecesID.OWN_SILVER.getId()) {
+            return "銀";
+        } else if (kind == PiecesID.OWN_GOLD.getId()) {
+            return "金";
+        } else if (kind == PiecesID.OWN_BISHOP.getId()) {
+            return "角";
+        } else if (kind == PiecesID.OWN_ROOK.getId()) {
+            return "飛";
+        } else if (kind == PiecesID.OWN_KING.getId()) {
+            return "王";
+        }
+        return "";
     }
 
     private void initBoardStatus() {
