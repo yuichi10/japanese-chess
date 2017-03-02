@@ -294,8 +294,14 @@ public class GameActivity extends AppCompatActivity {
 
     private int swapOwnAndOppKind(int kind) {
         if (isOppPiece(kind)) {
+            if (kind < 0) {
+                return kind + 10;
+            }
             return kind - 10;
         } else if (isOwnPiece(kind)) {
+            if (kind < 0) {
+                return kind - 10;
+            }
             return kind + 10;
         }
         return kind;
@@ -612,19 +618,19 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private String getPieceName(int kind) {
-        if (kind == PiecesID.OWN_PAWN.getId()) {
+        if (kind == PiecesID.OWN_PAWN.getId() || kind == PiecesID.OWN_PROMOTE_PAWN.getId()) {
             return "歩";
-        } else if (kind == PiecesID.OWN_LANCE.getId()) {
+        } else if (kind == PiecesID.OWN_LANCE.getId() || kind == PiecesID.OWN_PROMOTE_LANCE.getId()) {
             return "槍";
-        } else if (kind == PiecesID.OWN_KNIGHT.getId()) {
+        } else if (kind == PiecesID.OWN_KNIGHT.getId() || kind == PiecesID.OWN_PROMOTE_KNIGHT.getId()) {
             return "馬";
-        } else if (kind == PiecesID.OWN_SILVER.getId()) {
+        } else if (kind == PiecesID.OWN_SILVER.getId() || kind == PiecesID.OWN_PROMOTE_SILVER.getId()) {
             return "銀";
         } else if (kind == PiecesID.OWN_GOLD.getId()) {
             return "金";
-        } else if (kind == PiecesID.OWN_BISHOP.getId()) {
+        } else if (kind == PiecesID.OWN_BISHOP.getId() || kind == PiecesID.OWN_PROMOTE_BISHOP.getId()) {
             return "角";
-        } else if (kind == PiecesID.OWN_ROOK.getId()) {
+        } else if (kind == PiecesID.OWN_ROOK.getId() || kind == PiecesID.OWN_PROMOTE_ROOK.getId()) {
             return "飛";
         } else if (kind == PiecesID.OWN_KING.getId()) {
             return "王";
@@ -712,11 +718,17 @@ public class GameActivity extends AppCompatActivity {
         if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_KING.getId()) {
             return true;
         }
+        if (kind <= PiecesID.OWN_PROMOTE_PAWN.getId() && kind >= PiecesID.OWN_PROMOTE_SILVER.getId()) {
+            return true;
+        }
         return false;
     }
 
     private boolean isOppPiece(int kind) {
         if (kind >= PiecesID.OPP_PAWN.getId() && kind <= PiecesID.OPP_KING.getId()) {
+            return true;
+        }
+        if (kind <= PiecesID.OPP_PROMOTE_PAWN.getId() && kind >= PiecesID.OPP_PROMOTE_SILVER.getId()) {
             return true;
         }
         return false;
