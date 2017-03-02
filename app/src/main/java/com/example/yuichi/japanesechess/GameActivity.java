@@ -252,7 +252,7 @@ public class GameActivity extends AppCompatActivity {
                 if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
-                        setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), mMoveModel.getKind() + 10);
+                        setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
                     }
                     mIsMovable = true;
                     mChosePlace = PiecesID.NOTHING.getId();
