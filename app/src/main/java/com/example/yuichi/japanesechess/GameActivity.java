@@ -59,8 +59,11 @@ public class GameActivity extends AppCompatActivity {
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
     private MoveModel mMoveModel = null;
 
-    private TextView mWhichTurnTextView;
-    private TextView mWhereOppMoveTextView;
+    private TextView mWhichTurnTextView;    // どっちのターンか表示
+    private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
+
+    private Map<Integer, Integer> mOppInHandPieces; // key: piece id, value: num
+    private Map<Integer, Integer> mOwnInHandPieces; // key: piece id, value: num
 
     private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
     private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
@@ -82,6 +85,7 @@ public class GameActivity extends AppCompatActivity {
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
         setBackAlarm();
         initGameData();
+        initInHandData();
     }
 
     @Override
@@ -100,6 +104,19 @@ public class GameActivity extends AppCompatActivity {
         mBoardCellHeight = mBoardCellWidth * 39 / 35;
         initBoardView();
         initGameInfoTextView();
+    }
+
+    private void initInHandData() {
+        // 自分の持ち駒の初期化
+        mOppInHandPieces = new HashMap<>();
+        mOwnInHandPieces = new HashMap<>();
+        for (PiecesID pieceID : PiecesID.values()) {
+            if (isOwnPiece(pieceID.getId())){
+                mOwnInHandPieces.put(pieceID.getId(), 0);
+            } else if (isOppPiece(pieceID.getId())) {
+                mOppInHandPieces.put(pieceID.getId(), 0);
+            }
+        }
     }
 
     private void initGameInfoTextView() {
@@ -231,10 +248,34 @@ public class GameActivity extends AppCompatActivity {
         mLayoutParamsList.remove(pastPos);
         mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(pastPos));
         mPiecesViewList.remove(pastPos);
+        // もし駒を取っていたら追加
+        setInHandPieces(mBoardPieces[postPos]);
+        mLayoutParamsList.remove(postPos);
+        mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(postPos));
+        mPiecesViewList.remove(postPos);
         //新しい画像表示
         mBoardPieces[postPos] = kind;
         setOnBoardPieceView(postPos);
+    }
 
+    private int swapOwnAndOppKind(int kind) {
+        if (isOppPiece(kind)) {
+            return kind - 10;
+        } else if (isOwnPiece(kind)) {
+            return kind + 10;
+        }
+        return kind;
+    }
+
+    private void setInHandPieces(int takePieceKind) {
+        // 取った駒を追加
+        if (isOppPiece(takePieceKind)) {
+            int curNum = mOwnInHandPieces.get(swapOwnAndOppKind(takePieceKind));
+            mOwnInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+        } else if (isOwnPiece(takePieceKind)) {
+            int curNum = mOppInHandPieces.get(swapOwnAndOppKind(takePieceKind));
+            mOppInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
+        }
     }
 
     private int getPlaceFromTouchPosition(float x, float y) {
@@ -256,9 +297,9 @@ public class GameActivity extends AppCompatActivity {
     private void movePiece(int place) {
         // 駒を動かす
         if (mIsMovable) {
-            if (mBoardPieces[place] > 0 && mBoardPieces[place] < 9) {
+            if (mBoardPieces[place] >= PiecesID.OWN_PAWN.getId() && mBoardPieces[place] <= PiecesID.OWN_KING.getId()) {
                 mChosePlace = place;
-            } else if (mBoardPieces[place] == 0 && mChosePlace != 0) {
+            } else if ((isOppPiece(mBoardPieces[place]) || mBoardPieces[place] == 0) && mChosePlace != 0) {
                 int currentTurn = mMoveModel.getTurnNum();
                 mMoveModel.setTurnNum(currentTurn + 1);
                 mMoveModel.setPastPos(mChosePlace);
@@ -624,6 +665,20 @@ public class GameActivity extends AppCompatActivity {
                 mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
             }
         }
+    }
+
+    private boolean isOwnPiece(int kind) {
+        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_KING.getId()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isOppPiece(int kind) {
+        if (kind >= PiecesID.OPP_PAWN.getId() && kind <= PiecesID.OPP_KING.getId()) {
+            return true;
+        }
+        return false;
     }
 
     private void setFirstPlayer(RoomModel room) {
