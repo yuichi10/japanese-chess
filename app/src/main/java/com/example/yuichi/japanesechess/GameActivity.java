@@ -14,6 +14,7 @@ import android.view.MotionEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.yuichi.japanesechess.firebasemodel.MoveModel;
@@ -24,6 +25,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +58,9 @@ public class GameActivity extends AppCompatActivity {
     private boolean mIsMovable = false;             //自身のターンかどうか
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
     private MoveModel mMoveModel = null;
+
+    private TextView mWhichTurnTextView;
+    private TextView mWhereOppMoveTextView;
 
     private int mBoardCellWidth = 0;    //ボード一ますの横の長さ
     private int mBoardCellHeight = 0;   //ポード一マスの縦の長さ
@@ -93,6 +99,13 @@ public class GameActivity extends AppCompatActivity {
         // 将棋盤 => height : side = 39 : 35
         mBoardCellHeight = mBoardCellWidth * 39 / 35;
         initBoardView();
+        initGameInfoTextView();
+    }
+
+    private void initGameInfoTextView() {
+        // gameのinfoを表示するtext view の初期化
+        mWhichTurnTextView = (TextView)findViewById(R.id.which_turn_text_view);
+        mWhereOppMoveTextView = (TextView)findViewById(R.id.where_opp_move_info_text_view);
     }
 
     private void initBoardView() {
@@ -155,6 +168,14 @@ public class GameActivity extends AppCompatActivity {
         return 120 - place;
     }
 
+    private void setWhichTurnInfo(int turn) {
+        if (turn % 2 == mOwnTurn) {
+            mWhichTurnTextView.setText("あなたの番");
+        } else {
+            mWhichTurnTextView.setText("相手の番");
+        }
+    }
+
     private void initMoveData() {
         // 打ったデータのデータベースの取得
         DatabaseReference moveRef = mDatabase.child(getString(R.string.firebase_move)).child(mRoomID);
@@ -180,6 +201,7 @@ public class GameActivity extends AppCompatActivity {
                     Toast.makeText(GameActivity.this, "相手のターン",
                             Toast.LENGTH_SHORT).show();
                 }
+                setWhichTurnInfo(mMoveModel.getTurnNum());
             }
 
             @Override

@@ -12,6 +12,32 @@
         android:id="@+id/opponents_hand_pieces_area"
         android:layout_height="0dp">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/game_info_layout">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/which_turn_text_view"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_height="match_parent"
+                android:id="@+id/where_opp_move_info_text_view"
+                android:layout_weight="1"
+                android:layout_width="0dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:id="@+id/opp_hand_piece_info_layout"></LinearLayout>
     </LinearLayout>
 
     <LinearLayout
