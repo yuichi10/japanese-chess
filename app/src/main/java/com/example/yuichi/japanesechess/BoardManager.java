@@ -85,6 +85,26 @@ public class BoardManager {
         return null;
     }
 
+    public ArrayList<Integer> lanceMovablePlace(int place) {
+        ArrayList<Integer> movable = new ArrayList<>();
+        for (int i = place - 11; i > 0; i -= 11) {
+            if (isInGameBoard(i)) {
+                if (mBoardPieces[i] == 0) {
+                    movable.add(i);
+                    continue;
+                } else if (PiecesID.isOppPiece(mBoardPieces[i])) {
+                    movable.add(i);
+                    break;
+                }
+                break;
+            }
+        }
+        if (movable.size() == 0) {
+            return null;
+        }
+        return movable;
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -92,6 +112,8 @@ public class BoardManager {
         }
         if (mBoardPieces[place] == PiecesID.OWN_PAWN.getId()) {
             return pawnMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_LANCE.getId()) {
+            return lanceMovablePlace(place);
         }
         return null;
     }
