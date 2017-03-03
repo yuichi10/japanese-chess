@@ -103,7 +103,7 @@ public class BoardManager {
     }
 
     public void setContinueMovablePlace(ArrayList<Integer> movable, int place, int direction) {
-        for (int i = place + direction; i > 0; i += direction) {
+        for (int i = place + direction; ; i += direction) {
             if (isInGameBoard(i)) {
                 if (mBoardPieces[i] == 0) {
                     movable.add(i);
@@ -114,6 +114,7 @@ public class BoardManager {
                 }
                 break;
             }
+            break;
         }
     }
 
@@ -200,6 +201,16 @@ public class BoardManager {
         return getListOrNoSizeAsNull(movable);
     }
 
+    public ArrayList<Integer> rookMovablePlece(int place) {
+        // 飛車の動き
+        ArrayList<Integer> movable = new ArrayList<>();
+        setContinueMovablePlace(movable, place, up);
+        setContinueMovablePlace(movable, place, down);
+        setContinueMovablePlace(movable, place, right);
+        setContinueMovablePlace(movable, place, left);
+        return getListOrNoSizeAsNull(movable);
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -217,6 +228,8 @@ public class BoardManager {
             return goldMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_BISHOP.getId()) {
             return bishopMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_ROOK.getId()) {
+            return rookMovablePlece(place);
         }
         return null;
     }
