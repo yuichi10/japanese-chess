@@ -102,6 +102,21 @@ public class BoardManager {
         return false;
     }
 
+    public void setContinueMovablePlace(ArrayList<Integer> movable, int place, int direction) {
+        for (int i = place + direction; i > 0; i += direction) {
+            if (isInGameBoard(i)) {
+                if (mBoardPieces[i] == 0) {
+                    movable.add(i);
+                    continue;
+                } else if (PiecesID.isOppPiece(mBoardPieces[i])) {
+                    movable.add(i);
+                    break;
+                }
+                break;
+            }
+        }
+    }
+
     public ArrayList<Integer> pawnMovablePlace(int place) {
         // 歩の動き
         ArrayList<Integer> movable = new ArrayList<>();
@@ -114,18 +129,7 @@ public class BoardManager {
     public ArrayList<Integer> lanceMovablePlace(int place) {
         // 槍の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        for (int i = place + up; i > 0; i += up) {
-            if (isInGameBoard(i)) {
-                if (mBoardPieces[i] == 0) {
-                    movable.add(i);
-                    continue;
-                } else if (PiecesID.isOppPiece(mBoardPieces[i])) {
-                    movable.add(i);
-                    break;
-                }
-                break;
-            }
-        }
+        setContinueMovablePlace(movable, place, up);
         return getListOrNoSizeAsNull(movable);
     }
 
@@ -186,6 +190,16 @@ public class BoardManager {
         return getListOrNoSizeAsNull(movable);
     }
 
+    public ArrayList<Integer> bishopMovablePlace(int place) {
+        // 角の動き
+        ArrayList<Integer> movable = new ArrayList<>();
+        setContinueMovablePlace(movable, place, rightup);
+        setContinueMovablePlace(movable, place, leftup);
+        setContinueMovablePlace(movable, place, rightdown);
+        setContinueMovablePlace(movable, place, leftdown);
+        return getListOrNoSizeAsNull(movable);
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -201,6 +215,8 @@ public class BoardManager {
             return silverMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_GOLD.getId()) {
             return goldMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_BISHOP.getId()) {
+            return bishopMovablePlace(place);
         }
         return null;
     }
