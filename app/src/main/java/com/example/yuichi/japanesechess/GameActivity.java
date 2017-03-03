@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -406,8 +407,11 @@ public class GameActivity extends AppCompatActivity {
             if (PiecesID.isOwnPiece(boardManager.getBoardPiece(place))) {
                 mChosePlace = place;
             } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
-                movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
-                mIsMovable = false;
+                ArrayList<Integer> sss = boardManager.movablePlace(mChosePlace);
+                if (boardManager.movablePlace(mChosePlace) != null && boardManager.movablePlace(mChosePlace).indexOf(place) != -1) {
+                    movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
+                    mIsMovable = false;
+                }
             }
         }
     }

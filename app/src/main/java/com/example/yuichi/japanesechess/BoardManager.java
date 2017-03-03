@@ -1,5 +1,7 @@
 package com.example.yuichi.japanesechess;
 
+import java.util.ArrayList;
+
 /**
  * Created by yuichi on 2017/03/01.
  */
@@ -74,19 +76,24 @@ public class BoardManager {
 
 
 
-    public int[] pawnMovablePlace(int[] board, int place) {
+    public ArrayList<Integer> pawnMovablePlace(int place) {
+        ArrayList<Integer> movable = new ArrayList<>();
+        if (PiecesID.isOppPiece(mBoardPieces[place - 11]) || mBoardPieces[place - 11] == 0) {
+            movable.add(place - 11);
+            return movable;
+        }
         return null;
     }
 
-    public int[] movablePlace(int[] board, int place) {
-        int[] movable = null;
-        if (isInGameBoard(place)) {
+    public ArrayList<Integer> movablePlace(int place) {
+
+        if (!isInGameBoard(place)) {
             return null;
         }
-        if (board[place] == PiecesID.OWN_PAWN.getId()) {
-            return movable;
+        if (mBoardPieces[place] == PiecesID.OWN_PAWN.getId()) {
+            return pawnMovablePlace(place);
         }
-        return movable;
+        return null;
     }
 
     private void initBoardStatus() {
