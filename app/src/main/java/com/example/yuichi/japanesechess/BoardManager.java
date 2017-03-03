@@ -1,6 +1,7 @@
 package com.example.yuichi.japanesechess;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 
 /**
  * Created by yuichi on 2017/03/01.
@@ -77,6 +78,7 @@ public class BoardManager {
 
 
     public ArrayList<Integer> pawnMovablePlace(int place) {
+        // 歩の動き
         ArrayList<Integer> movable = new ArrayList<>();
         if (PiecesID.isOppPiece(mBoardPieces[place - 11]) || mBoardPieces[place - 11] == 0) {
             movable.add(place - 11);
@@ -86,6 +88,7 @@ public class BoardManager {
     }
 
     public ArrayList<Integer> lanceMovablePlace(int place) {
+        // 槍の動き
         ArrayList<Integer> movable = new ArrayList<>();
         for (int i = place - 11; i > 0; i -= 11) {
             if (isInGameBoard(i)) {
@@ -105,6 +108,25 @@ public class BoardManager {
         return movable;
     }
 
+    public ArrayList<Integer> knightMovablePlace(int place) {
+        // 桂馬の動き
+        ArrayList<Integer> movable = new ArrayList<>();
+        if (isInGameBoard(place - 23)) {
+            if (mBoardPieces[place - 23] == 0 || PiecesID.isOppPiece(mBoardPieces[place - 23])) {
+                movable.add(place - 23);
+            }
+        }
+        if (isInGameBoard(place - 21)) {
+            if (mBoardPieces[place - 21] == 0 || PiecesID.isOppPiece(mBoardPieces[place - 21])) {
+                movable.add(place - 21);
+            }
+        }
+        if (movable.size() == 0) {
+            return null;
+        }
+        return movable;
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -114,6 +136,8 @@ public class BoardManager {
             return pawnMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_LANCE.getId()) {
             return lanceMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_KNIGHT.getId()) {
+            return knightMovablePlace(place);
         }
         return null;
     }
