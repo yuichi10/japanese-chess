@@ -1,5 +1,7 @@
 package com.example.yuichi.japanesechess;
 
+import android.support.v4.app.INotificationSideChannel;
+
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 
@@ -75,16 +77,29 @@ public class BoardManager {
         }
     }
 
+    public ArrayList<Integer> getListOrNoSizeAsNull(ArrayList<Integer> list) {
+        if (list.size() == 0) {
+            return null;
+        }
+        return list;
+    }
 
+    public boolean isMovable(int nextPlace) {
+        if (isInGameBoard(nextPlace)) {
+            if (PiecesID.isOppPiece(mBoardPieces[nextPlace]) || mBoardPieces[nextPlace] == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public ArrayList<Integer> pawnMovablePlace(int place) {
         // 歩の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        if (PiecesID.isOppPiece(mBoardPieces[place - 11]) || mBoardPieces[place - 11] == 0) {
-            movable.add(place - 11);
-            return movable;
+        if (isMovable(place-11)) {
+            movable.add(place-11);
         }
-        return null;
+        return getListOrNoSizeAsNull(movable);
     }
 
     public ArrayList<Integer> lanceMovablePlace(int place) {
@@ -102,29 +117,41 @@ public class BoardManager {
                 break;
             }
         }
-        if (movable.size() == 0) {
-            return null;
-        }
-        return movable;
+        return getListOrNoSizeAsNull(movable);
     }
 
     public ArrayList<Integer> knightMovablePlace(int place) {
         // 桂馬の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        if (isInGameBoard(place - 23)) {
-            if (mBoardPieces[place - 23] == 0 || PiecesID.isOppPiece(mBoardPieces[place - 23])) {
-                movable.add(place - 23);
+        if (isMovable(place-23)) {
+            movable.add(place - 23);
+        }
+        if (isMovable(place-21)) {
+            movable.add(place - 21);
+        }
+        return getListOrNoSizeAsNull(movable);
+    }
+
+    public ArrayList<Integer> silverMovablePlace(int place) {
+        // 銀の動き
+        /*
+        ArrayList<Integer> movable = new ArrayList<>();
+        int checkPlace = place-11;
+        if (isInGameBoard(checkPlace)) {
+            if (PiecesID.isOppPiece(mBoardPieces[checkPlace]) || mBoardPieces[checkPlace] == 0) {
+                movable.add(checkPlace);
             }
         }
-        if (isInGameBoard(place - 21)) {
-            if (mBoardPieces[place - 21] == 0 || PiecesID.isOppPiece(mBoardPieces[place - 21])) {
-                movable.add(place - 21);
+        checkPlace = place+1;
+        if (isInGameBoard(checkPlace)) {
+            if (PiecesID.isOppPiece(mBoardPieces[checkPlace]) || mBoardPieces[checkPlace] == 0) {
+                movable.add(checkPlace);
             }
         }
-        if (movable.size() == 0) {
-            return null;
-        }
-        return movable;
+        checkPlace = place-1;
+        */
+        return null;
+
     }
 
     public ArrayList<Integer> movablePlace(int place) {
@@ -138,6 +165,8 @@ public class BoardManager {
             return lanceMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_KNIGHT.getId()) {
             return knightMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_SILVER.getId()) {
+            return silverMovablePlace(place);
         }
         return null;
     }
