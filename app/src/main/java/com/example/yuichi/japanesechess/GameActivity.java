@@ -55,9 +55,9 @@ public class GameActivity extends AppCompatActivity {
     private RelativeLayout mOnBoardPiecesLayout;        //ボードを表示してるレイアウト
     private ImageView mBoardImageView;
     private LinearLayout mBaseLayout;
+    private BoardManager boardManager;
     private Map<Integer, ImageView> mPiecesViewList;     //場所の画像
     private Map<Integer, RelativeLayout.LayoutParams> mLayoutParamsList; //画像の場所大きさ
-    private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
     private int mOwnTurn = NOT_TURN_DECIDED;        //自分のターンがどっちか
     private boolean mIsMovable = false;             //自身のターンかどうか
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
@@ -89,6 +89,7 @@ public class GameActivity extends AppCompatActivity {
             return;
         }
         mRoomRef = mDatabase.child(getString(R.string.firebase_rooms)).child(mRoomID);
+        boardManager = BoardManager.getNewInstance();
         setBackAlarm();
         initGameData();
         initInHandData();
@@ -168,7 +169,6 @@ public class GameActivity extends AppCompatActivity {
     private void initBoardView() {
         mPiecesViewList = new HashMap<>();
         mLayoutParamsList = new HashMap<>();
-        initBoardStatus();
         initBoardImages();
     }
 
@@ -285,17 +285,17 @@ public class GameActivity extends AppCompatActivity {
 
     private void setMoveImages(int pastPos, int postPos, int kind) {
         // 過去の画像を削除
-        mBoardPieces[pastPos] = 0;
+        boardManager.setBoardPiece(pastPos, PiecesID.NOTHING.getId());
         mLayoutParamsList.remove(pastPos);
         mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(pastPos));
         mPiecesViewList.remove(pastPos);
         // もし駒を取っていたら追加
-        setInHandPieces(mBoardPieces[postPos]);
+        setInHandPieces(boardManager.getBoardPiece(postPos));
         mLayoutParamsList.remove(postPos);
         mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(postPos));
         mPiecesViewList.remove(postPos);
         //新しい画像表示
-        mBoardPieces[postPos] = kind;
+        boardManager.setBoardPiece(postPos, kind);
         setOnBoardPieceView(postPos);
     }
 
@@ -403,10 +403,10 @@ public class GameActivity extends AppCompatActivity {
     private void gameBoardTouchProcess(int place) {
         // ゲームボードをタッチされた時の処理
         if (mIsMovable) {
-            if (mBoardPieces[place] >= PiecesID.OWN_PAWN.getId() && mBoardPieces[place] <= PiecesID.OWN_KING.getId()) {
+            if (boardManager.getBoardPiece(place) >= PiecesID.OWN_PAWN.getId() && boardManager.getBoardPiece(place) <= PiecesID.OWN_KING.getId()) {
                 mChosePlace = place;
-            } else if ((isOppPiece(mBoardPieces[place]) || mBoardPieces[place] == 0) && mChosePlace != 0) {
-                movePiece(mChosePlace, place, mBoardPieces[mChosePlace]);
+            } else if ((isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
+                movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
                 mIsMovable = false;
             }
         }
@@ -467,7 +467,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void setOnBoardPieceView(int place) {
         ImageView image;
-        switch (mBoardPieces[place]) {
+        switch (boardManager.getBoardPiece(place)) {
             case 1:
                 // 画像をセット
                 image = new ImageView(this);
@@ -690,82 +690,6 @@ public class GameActivity extends AppCompatActivity {
             return "王";
         }
         return "";
-    }
-
-    private void initBoardStatus() {
-        for (int i = 0; i < 121; i++) {
-            if (i < 11) {
-                mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-            } else if (i < 22) {
-                if (i == 11 || i == 21) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else if (i == 12 || i == 20) {
-                    mBoardPieces[i] = PiecesID.OPP_LANCE.getId();
-                } else if (i == 13 || i == 19) {
-                    mBoardPieces[i] = PiecesID.OPP_KNIGHT.getId();
-                } else if (i == 14 || i == 18) {
-                    mBoardPieces[i] = PiecesID.OPP_SILVER.getId();
-                } else if (i == 15 || i == 17) {
-                    mBoardPieces[i] = PiecesID.OPP_GOLD.getId();
-                } else if (i == 16) {
-                    mBoardPieces[i] = PiecesID.OPP_KING.getId();
-                }
-            } else if (i < 33) {
-                if (i == 24) {
-                    mBoardPieces[i] = PiecesID.OPP_ROOK.getId();
-                } else if (i == 30) {
-                    mBoardPieces[i] = PiecesID.OPP_BISHOP.getId();
-                } else if (i == 22 || i == 32) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else {
-                    mBoardPieces[i] = PiecesID.NOTHING.getId();
-                }
-            } else if (i < 44) {
-                if (i == 33 || i == 43) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else {
-                    mBoardPieces[i] = PiecesID.OPP_PAWN.getId();
-                }
-            } else if (i < 77) {
-                if (i % 11 == 0 || (i + 1) % 11 == 0) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else {
-                    mBoardPieces[i] = PiecesID.NOTHING.getId();
-                }
-            } else if (i < 88) {
-                if (i == 77 || i == 87) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else {
-                    mBoardPieces[i] = PiecesID.OWN_PAWN.getId();
-                }
-            } else if (i < 99) {
-                if (i == 90) {
-                    mBoardPieces[i] = PiecesID.OWN_BISHOP.getId();
-                } else if (i == 96) {
-                    mBoardPieces[i] = PiecesID.OWN_ROOK.getId();
-                } else if (i == 88 || i == 98) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else {
-                    mBoardPieces[i] = PiecesID.NOTHING.getId();
-                }
-            } else if (i < 110) {
-                if (i == 99 || i == 109) {
-                    mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-                } else if (i == 100 || i == 108) {
-                    mBoardPieces[i] = PiecesID.OWN_LANCE.getId();
-                } else if (i == 101 || i == 107) {
-                    mBoardPieces[i] = PiecesID.OWN_KNIGHT.getId();
-                } else if (i == 102 || i == 106) {
-                    mBoardPieces[i] = PiecesID.OWN_SILVER.getId();
-                } else if (i == 103 || i == 105) {
-                    mBoardPieces[i] = PiecesID.OWN_GOLD.getId();
-                } else if (i == 104) {
-                    mBoardPieces[i] = PiecesID.OWN_KING.getId();
-                }
-            } else {
-                mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
-            }
-        }
     }
 
     private boolean isPromotablePiece(int kind) {
