@@ -10,6 +10,15 @@ import java.util.InputMismatchException;
  */
 
 public class BoardManager {
+    final int up = -11;
+    final int rightup = -10;
+    final int leftup = -12;
+    final int right = 1;
+    final int left = -1;
+    final int down = 11;
+    final int rightdown = 12;
+    final int leftdown = 10;
+
     public static BoardManager boardManager = null;
     private int[] mBoardPieces = new int[121];      //ボードのデータ一覧どの駒がどこにあるかどうか
 
@@ -96,8 +105,8 @@ public class BoardManager {
     public ArrayList<Integer> pawnMovablePlace(int place) {
         // 歩の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        if (isMovable(place-11)) {
-            movable.add(place-11);
+        if (isMovable(place+up)) {
+            movable.add(place+up);
         }
         return getListOrNoSizeAsNull(movable);
     }
@@ -105,7 +114,7 @@ public class BoardManager {
     public ArrayList<Integer> lanceMovablePlace(int place) {
         // 槍の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        for (int i = place - 11; i > 0; i -= 11) {
+        for (int i = place + up; i > 0; i += up) {
             if (isInGameBoard(i)) {
                 if (mBoardPieces[i] == 0) {
                     movable.add(i);
@@ -123,11 +132,11 @@ public class BoardManager {
     public ArrayList<Integer> knightMovablePlace(int place) {
         // 桂馬の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        if (isMovable(place-23)) {
-            movable.add(place - 23);
+        if (isMovable(place+up+rightup)) {
+            movable.add(place+up+rightup);
         }
-        if (isMovable(place-21)) {
-            movable.add(place - 21);
+        if (isMovable(place+up+leftup)) {
+            movable.add(place+up+leftup);
         }
         return getListOrNoSizeAsNull(movable);
     }
@@ -135,20 +144,20 @@ public class BoardManager {
     public ArrayList<Integer> silverMovablePlace(int place) {
         // 銀の動き
         ArrayList<Integer> movable = new ArrayList<>();
-        if (isMovable(place-11)) {
-            movable.add(place-11);
+        if (isMovable(place+up)) {
+            movable.add(place+up);
         }
-        if (isInGameBoard(place-12)) {
-            movable.add(place-12);
+        if (isInGameBoard(place+leftup)) {
+            movable.add(place+leftup);
         }
-        if (isInGameBoard(place-10)) {
-            movable.add(place-10);
+        if (isInGameBoard(place+rightup)) {
+            movable.add(place+rightup);
         }
-        if (isInGameBoard(place+12)) {
-            movable.add(place+12);
+        if (isInGameBoard(place+rightdown)) {
+            movable.add(place+rightdown);
         }
-        if (isInGameBoard(place+10)) {
-            movable.add(place+10);
+        if (isInGameBoard(place+leftdown)) {
+            movable.add(place+leftdown);
         }
         return getListOrNoSizeAsNull(movable);
 
