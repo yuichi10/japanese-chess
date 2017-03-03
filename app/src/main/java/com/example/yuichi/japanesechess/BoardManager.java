@@ -211,6 +211,35 @@ public class BoardManager {
         return getListOrNoSizeAsNull(movable);
     }
 
+    public ArrayList<Integer> kingMovablePlace(int place) {
+        ArrayList<Integer> movable = new ArrayList<>();
+        if (isInGameBoard(place+up)) {
+            movable.add(place+up);
+        }
+        if (isInGameBoard(place+rightup)) {
+            movable.add(place+rightup);
+        }
+        if (isInGameBoard(place+right)) {
+            movable.add(place+right);
+        }
+        if (isInGameBoard(place+rightdown)) {
+            movable.add(place+rightdown);
+        }
+        if (isInGameBoard(place+down)) {
+            movable.add(place+down);
+        }
+        if (isInGameBoard(place+leftdown)) {
+            movable.add(place+leftdown);
+        }
+        if (isInGameBoard(place+left)) {
+            movable.add(place+left);
+        }
+        if (isInGameBoard(place+leftup)) {
+            movable.add(place+leftup);
+        }
+        return getListOrNoSizeAsNull(movable);
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -230,6 +259,8 @@ public class BoardManager {
             return bishopMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_ROOK.getId()) {
             return rookMovablePlece(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_KING.getId()) {
+            return kingMovablePlace(place);
         }
         return null;
     }
