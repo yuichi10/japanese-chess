@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -64,6 +65,7 @@ public class GameActivity extends AppCompatActivity {
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
     private MoveModel mMoveModel = null;
     private int mCurrentTurn = 0;
+    private ImageView mHighLightImageView;
 
     private TextView mWhichTurnTextView;    // どっちのターンか表示
     private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
@@ -170,6 +172,9 @@ public class GameActivity extends AppCompatActivity {
     private void initBoardView() {
         mPiecesViewList = new HashMap<>();
         mLayoutParamsList = new HashMap<>();
+        mHighLightImageView = new ImageView(this);
+        mHighLightImageView.setBackgroundColor(Color.RED);
+        mHighLightImageView.setAlpha(0.3f);
         initBoardImages();
     }
 
@@ -401,15 +406,29 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    private void showPlaceHighLight() {
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(mBoardCellWidth, mBoardCellHeight);
+        lp.leftMargin = getLeftMargin(mChosePlace);
+        lp.topMargin = getTopMargin(mChosePlace);
+        mOnBoardPiecesLayout.addView(mHighLightImageView, lp);
+    }
+
+    private void delPlaceHighLight() {
+        mOnBoardPiecesLayout.removeViewInLayout(mHighLightImageView);
+    }
+
     private void gameBoardTouchProcess(int place) {
         // ゲームボードをタッチされた時の処理
         if (mIsMovable) {
             if (PiecesID.isOwnPiece(boardManager.getBoardPiece(place))) {
                 mChosePlace = place;
+                delPlaceHighLight();
+                showPlaceHighLight();
             } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
                 ArrayList<Integer> sss = boardManager.movablePlace(mChosePlace);
                 if (boardManager.movablePlace(mChosePlace) != null && boardManager.movablePlace(mChosePlace).indexOf(place) != -1) {
                     movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
+                    delPlaceHighLight();
                     mIsMovable = false;
                 }
             }
