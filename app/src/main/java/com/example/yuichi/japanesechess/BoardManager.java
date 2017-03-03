@@ -160,7 +160,30 @@ public class BoardManager {
             movable.add(place+leftdown);
         }
         return getListOrNoSizeAsNull(movable);
+    }
 
+    public ArrayList<Integer> goldMovablePlace(int place) {
+        // 金の動き
+        ArrayList<Integer> movable = new ArrayList<>();
+        if (isMovable(place+up)) {
+            movable.add(place+up);
+        }
+        if (isInGameBoard(place+leftup)) {
+            movable.add(place+leftup);
+        }
+        if (isInGameBoard(place+rightup)) {
+            movable.add(place+rightup);
+        }
+        if (isInGameBoard(place+right)) {
+            movable.add(place+right);
+        }
+        if (isInGameBoard(place+left)) {
+            movable.add(place+left);
+        }
+        if (isInGameBoard(place+down)) {
+            movable.add(place+down);
+        }
+        return getListOrNoSizeAsNull(movable);
     }
 
     public ArrayList<Integer> movablePlace(int place) {
@@ -176,6 +199,8 @@ public class BoardManager {
             return knightMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_SILVER.getId()) {
             return silverMovablePlace(place);
+        } else if (mBoardPieces[place] == PiecesID.OWN_GOLD.getId()) {
+            return goldMovablePlace(place);
         }
         return null;
     }
