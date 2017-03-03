@@ -201,13 +201,53 @@ public class BoardManager {
         return getListOrNoSizeAsNull(movable);
     }
 
-    public ArrayList<Integer> rookMovablePlece(int place) {
+    public ArrayList<Integer> bishopPromoteMovablePlace(int place) {
+        ArrayList<Integer> movable = bishopMovablePlace(place);
+        if (movable == null) {
+            movable = new ArrayList<>();
+        }
+        if (isMovable(place+up)) {
+            movable.add(place+up);
+        }
+        if (isInGameBoard(place+right)) {
+            movable.add(place+right);
+        }
+        if (isInGameBoard(place+down)) {
+            movable.add(place+down);
+        }
+        if (isInGameBoard(place+left)) {
+            movable.add(place+left);
+        }
+        return getListOrNoSizeAsNull(movable);
+    }
+
+    public ArrayList<Integer> rookMovablePlace(int place) {
         // 飛車の動き
         ArrayList<Integer> movable = new ArrayList<>();
         setContinueMovablePlace(movable, place, up);
         setContinueMovablePlace(movable, place, down);
         setContinueMovablePlace(movable, place, right);
         setContinueMovablePlace(movable, place, left);
+        return getListOrNoSizeAsNull(movable);
+    }
+
+    public ArrayList<Integer> rookPromoteMovablePlace(int place) {
+        ArrayList<Integer> movable = rookMovablePlace(place);
+        if (movable == null) {
+            movable = new ArrayList<>();
+        }
+        if (isMovable(place+rightup)) {
+            movable.add(place+rightup);
+        }
+        if (isInGameBoard(place+rightdown)) {
+            movable.add(place+rightdown);
+        }
+        if (isInGameBoard(place+leftdown)) {
+            movable.add(place+leftdown);
+        }
+        if (isInGameBoard(place+leftup)) {
+            movable.add(place+leftup);
+        }
         return getListOrNoSizeAsNull(movable);
     }
 
@@ -258,9 +298,17 @@ public class BoardManager {
         } else if (mBoardPieces[place] == PiecesID.OWN_BISHOP.getId()) {
             return bishopMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_ROOK.getId()) {
-            return rookMovablePlece(place);
+            return rookMovablePlace(place);
         } else if (mBoardPieces[place] == PiecesID.OWN_KING.getId()) {
             return kingMovablePlace(place);
+        } else if (mBoardPieces[place] < 0) {
+            if (mBoardPieces[place] == PiecesID.OWN_PROMOTE_BISHOP.getId()) {
+                return bishopPromoteMovablePlace(place);
+            } else if (mBoardPieces[place] == PiecesID.OWN_PROMOTE_ROOK.getId()) {
+                return rookPromoteMovablePlace(place);
+            } else {
+                return goldMovablePlace(place);
+            }
         }
         return null;
     }
