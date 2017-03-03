@@ -134,23 +134,23 @@ public class BoardManager {
 
     public ArrayList<Integer> silverMovablePlace(int place) {
         // 銀の動き
-        /*
         ArrayList<Integer> movable = new ArrayList<>();
-        int checkPlace = place-11;
-        if (isInGameBoard(checkPlace)) {
-            if (PiecesID.isOppPiece(mBoardPieces[checkPlace]) || mBoardPieces[checkPlace] == 0) {
-                movable.add(checkPlace);
-            }
+        if (isMovable(place-11)) {
+            movable.add(place-11);
         }
-        checkPlace = place+1;
-        if (isInGameBoard(checkPlace)) {
-            if (PiecesID.isOppPiece(mBoardPieces[checkPlace]) || mBoardPieces[checkPlace] == 0) {
-                movable.add(checkPlace);
-            }
+        if (isInGameBoard(place-12)) {
+            movable.add(place-12);
         }
-        checkPlace = place-1;
-        */
-        return null;
+        if (isInGameBoard(place-10)) {
+            movable.add(place-10);
+        }
+        if (isInGameBoard(place+12)) {
+            movable.add(place+12);
+        }
+        if (isInGameBoard(place+10)) {
+            movable.add(place+10);
+        }
+        return getListOrNoSizeAsNull(movable);
 
     }
 
