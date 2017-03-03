@@ -46,4 +46,31 @@ public enum PiecesID {
     public int getId() {
         return id;
     }
+
+    public static boolean isPromotablePiece(int kind) {
+        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_SILVER.getId()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isOwnPiece(int kind) {
+        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_KING.getId()) {
+            return true;
+        }
+        if (kind <= PiecesID.OWN_PROMOTE_PAWN.getId() && kind >= PiecesID.OWN_PROMOTE_SILVER.getId()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isOppPiece(int kind) {
+        if (kind >= PiecesID.OPP_PAWN.getId() && kind <= PiecesID.OPP_KING.getId()) {
+            return true;
+        }
+        if (kind <= PiecesID.OPP_PROMOTE_PAWN.getId() && kind >= PiecesID.OPP_PROMOTE_SILVER.getId()) {
+            return true;
+        }
+        return false;
+    }
 }

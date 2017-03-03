@@ -122,9 +122,9 @@ public class GameActivity extends AppCompatActivity {
         mInHandImageButtons = new HashMap<>();
         mInHandNumTextView = new HashMap<>();
         for (PiecesID pieceID : PiecesID.values()) {
-            if (isOwnPiece(pieceID.getId())){
+            if (PiecesID.isOwnPiece(pieceID.getId())){
                 mInHandPieces.put(pieceID.getId(), 0);
-            } else if (isOppPiece(pieceID.getId())) {
+            } else if (PiecesID.isOppPiece(pieceID.getId())) {
                 mInHandPieces.put(pieceID.getId(), 0);
             }
         }
@@ -300,12 +300,12 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int swapOwnAndOppKind(int kind) {
-        if (isOppPiece(kind)) {
+        if (PiecesID.isOppPiece(kind)) {
             if (kind < 0) {
                 return kind + 10;
             }
             return kind - 10;
-        } else if (isOwnPiece(kind)) {
+        } else if (PiecesID.isOwnPiece(kind)) {
             if (kind < 0) {
                 return kind - 10;
             }
@@ -321,11 +321,11 @@ public class GameActivity extends AppCompatActivity {
 
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
-        if (isOppPiece(takePieceKind)) {
+        if (PiecesID.isOppPiece(takePieceKind)) {
             int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
             mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
             setInHandNum(swapOwnAndOppKind(takePieceKind));
-        } else if (isOwnPiece(takePieceKind)) {
+        } else if (PiecesID.isOwnPiece(takePieceKind)) {
             int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
             mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
             setInHandNum(swapOwnAndOppKind(takePieceKind));
@@ -370,7 +370,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void movePiece(final int pastPlace, int postPlace, final int kind) {
         // 実際に駒を動かす
-        if (!isPromotablePiece(kind) || (pastPlace > 44 && postPlace > 44)) {
+        if (!PiecesID.isPromotablePiece(kind) || (pastPlace > 44 && postPlace > 44)) {
             sendMoveInfo(pastPlace, postPlace, kind);
             setMoveImages(pastPlace, postPlace, kind);
         } else {
@@ -403,9 +403,9 @@ public class GameActivity extends AppCompatActivity {
     private void gameBoardTouchProcess(int place) {
         // ゲームボードをタッチされた時の処理
         if (mIsMovable) {
-            if (boardManager.getBoardPiece(place) >= PiecesID.OWN_PAWN.getId() && boardManager.getBoardPiece(place) <= PiecesID.OWN_KING.getId()) {
+            if (PiecesID.isOwnPiece(boardManager.getBoardPiece(place))) {
                 mChosePlace = place;
-            } else if ((isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
+            } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
                 movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
                 mIsMovable = false;
             }
@@ -690,33 +690,6 @@ public class GameActivity extends AppCompatActivity {
             return "王";
         }
         return "";
-    }
-
-    private boolean isPromotablePiece(int kind) {
-        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_SILVER.getId()) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isOwnPiece(int kind) {
-        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_KING.getId()) {
-            return true;
-        }
-        if (kind <= PiecesID.OWN_PROMOTE_PAWN.getId() && kind >= PiecesID.OWN_PROMOTE_SILVER.getId()) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isOppPiece(int kind) {
-        if (kind >= PiecesID.OPP_PAWN.getId() && kind <= PiecesID.OPP_KING.getId()) {
-            return true;
-        }
-        if (kind <= PiecesID.OPP_PROMOTE_PAWN.getId() && kind >= PiecesID.OPP_PROMOTE_SILVER.getId()) {
-            return true;
-        }
-        return false;
     }
 
     private void setFirstPlayer(RoomModel room) {
