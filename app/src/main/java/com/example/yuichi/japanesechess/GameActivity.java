@@ -44,6 +44,8 @@ public class GameActivity extends AppCompatActivity {
     // 自身のターン
     int NOT_TURN_DECIDED = -1, TURN_FIRST = 0, TURN_SECOND = 1;
 
+    private boolean isInit = false;
+
     private DatabaseReference mDatabase;        //database への接続
     private SharedPreferences sharedData;       //cache データ
     private AlertDialog.Builder mAlertDialog;   //アラートのダイアログ
@@ -60,6 +62,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean mIsMovable = false;             //自身のターンかどうか
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
     private MoveModel mMoveModel = null;
+    private int mCurrentTurn = 0;
 
     private TextView mWhichTurnTextView;    // どっちのターンか表示
     private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
@@ -94,19 +97,22 @@ public class GameActivity extends AppCompatActivity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        mDisplayWidth = dm.widthPixels;
-        mDisplayHeight = dm.heightPixels;
-        mOnBoardPiecesLayout = (RelativeLayout) findViewById(R.id.on_board_pieces_layout);
-        mBaseLayout = (LinearLayout) findViewById(R.id.play_game_view_origin_layer);
-        mBoardImageView = (ImageView) findViewById(R.id.board_image_view);
-        int extraBoardWidth = mBoardImageView.getWidth() / 38;
-        mBoardCellWidth = (mBoardImageView.getWidth() - extraBoardWidth * 2) / 9;
-        // 将棋盤 => height : side = 39 : 35
-        mBoardCellHeight = mBoardCellWidth * 39 / 35;
-        initBoardView();
-        initGameInfoTextView();
+        if (!isInit) {
+            isInit = true;
+            DisplayMetrics dm = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(dm);
+            mDisplayWidth = dm.widthPixels;
+            mDisplayHeight = dm.heightPixels;
+            mOnBoardPiecesLayout = (RelativeLayout) findViewById(R.id.on_board_pieces_layout);
+            mBaseLayout = (LinearLayout) findViewById(R.id.play_game_view_origin_layer);
+            mBoardImageView = (ImageView) findViewById(R.id.board_image_view);
+            int extraBoardWidth = mBoardImageView.getWidth() / 38;
+            mBoardCellWidth = (mBoardImageView.getWidth() - extraBoardWidth * 2) / 9;
+            // 将棋盤 => height : side = 39 : 35
+            mBoardCellHeight = mBoardCellWidth * 39 / 35;
+            initBoardView();
+            initGameInfoTextView();
+        }
     }
 
     private void initInHandData() {
@@ -249,7 +255,8 @@ public class GameActivity extends AppCompatActivity {
                 if (mMoveModel == null) {
                     return;
                 }
-                if (mMoveModel.getTurnNum() % 2 == mOwnTurn) {
+                mCurrentTurn = mMoveModel.getTurnNum();
+                if (mCurrentTurn % 2 == mOwnTurn) {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
                         setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
@@ -341,19 +348,66 @@ public class GameActivity extends AppCompatActivity {
         return xPos + yPos * 11;
     }
 
-    private void movePiece(int place) {
-        // 駒を動かす
+    private void setMoveInfo(int pastPlace, int postPlace, int kind) {
+        mMoveModel.setTurnNum(mCurrentTurn + 1);
+        mMoveModel.setPastPos(pastPlace);
+        mMoveModel.setPostPos(postPlace);
+        mMoveModel.setKind(kind);
+    }
+
+    private void sendMoveInfo() {
+        mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(mMoveModel);
+    }
+
+    private void sendMoveInfo(int pastPlace, int postPlace, int kind) {
+
+        mMoveModel.setTurnNum(mCurrentTurn + 1);
+        mMoveModel.setPastPos(pastPlace);
+        mMoveModel.setPostPos(postPlace);
+        mMoveModel.setKind(kind);
+        mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(mMoveModel);
+    }
+
+    private void movePiece(final int pastPlace, int postPlace, final int kind) {
+        // 実際に駒を動かす
+        if (!isPromotablePiece(kind) || (pastPlace > 44 && postPlace > 44)) {
+            sendMoveInfo(pastPlace, postPlace, kind);
+            setMoveImages(pastPlace, postPlace, kind);
+        } else {
+            setMoveInfo(pastPlace, postPlace, kind);
+            AlertDialog.Builder promoteDialog = new AlertDialog.Builder(this);
+            promoteDialog.setTitle("成りますか？");
+            promoteDialog.setPositiveButton(
+                    "YES",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mMoveModel.setKind(kind * -1);
+                            sendMoveInfo();
+                            setMoveImages(mMoveModel.getPastPos(), mMoveModel.getPostPos(), mMoveModel.getKind());
+                        }
+                    });
+            promoteDialog.setNegativeButton(
+                    "NO",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            sendMoveInfo();
+                            setMoveImages(mMoveModel.getPastPos(), mMoveModel.getPostPos(), mMoveModel.getKind());
+                        }
+                    });
+            promoteDialog.show();
+        }
+    }
+
+    private void gameBoardTouchProcess(int place) {
+        // ゲームボードをタッチされた時の処理
         if (mIsMovable) {
             if (mBoardPieces[place] >= PiecesID.OWN_PAWN.getId() && mBoardPieces[place] <= PiecesID.OWN_KING.getId()) {
                 mChosePlace = place;
             } else if ((isOppPiece(mBoardPieces[place]) || mBoardPieces[place] == 0) && mChosePlace != 0) {
-                int currentTurn = mMoveModel.getTurnNum();
-                mMoveModel.setTurnNum(currentTurn + 1);
-                mMoveModel.setPastPos(mChosePlace);
-                mMoveModel.setPostPos(place);
-                mMoveModel.setKind(mBoardPieces[mChosePlace]);
-                mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(mMoveModel);
-                setMoveImages(mChosePlace, place, mBoardPieces[mChosePlace]);
+                movePiece(mChosePlace, place, mBoardPieces[mChosePlace]);
+                mIsMovable = false;
             }
         }
     }
@@ -362,7 +416,7 @@ public class GameActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         Log.d("TouchEvent", "X:" + event.getX() + ",Y:" + event.getY());
         int touchPos = getPlaceFromTouchPosition(event.getX(), event.getY());
-        movePiece(touchPos);
+        gameBoardTouchProcess(touchPos);
         return true;
     }
 
@@ -712,6 +766,13 @@ public class GameActivity extends AppCompatActivity {
                 mBoardPieces[i] = PiecesID.OUT_BOARD.getId();
             }
         }
+    }
+
+    private boolean isPromotablePiece(int kind) {
+        if (kind >= PiecesID.OWN_PAWN.getId() && kind <= PiecesID.OWN_SILVER.getId()) {
+            return true;
+        }
+        return false;
     }
 
     private boolean isOwnPiece(int kind) {
