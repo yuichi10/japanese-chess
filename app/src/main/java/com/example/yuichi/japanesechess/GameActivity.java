@@ -469,7 +469,9 @@ public class GameActivity extends AppCompatActivity {
                 delPlaceHighLight();
                 showPlaceHighLight();
             } else if (boardManager.getBoardPiece(place) == PiecesID.NOTHING.getId() && isInHandPlace(mChosePlace)) {
-                movePiece(mChosePlace, place, mChosePlace * -1);
+                if (boardManager.isDropable(place, mChosePlace * -1)){
+                    movePiece(mChosePlace, place, mChosePlace * -1);
+                }
             } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
                 ArrayList<Integer> sss = boardManager.movablePlace(mChosePlace);
                 if (boardManager.movablePlace(mChosePlace) != null && boardManager.movablePlace(mChosePlace).indexOf(place) != -1) {

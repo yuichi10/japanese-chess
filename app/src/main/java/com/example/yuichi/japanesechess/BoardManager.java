@@ -313,6 +313,73 @@ public class BoardManager {
         return null;
     }
 
+    public ArrayList<Integer> movablePlace(int place, int kind) {
+        if (!isInGameBoard(place)) {
+            return null;
+        }
+        if (kind == PiecesID.OWN_PAWN.getId()) {
+            return pawnMovablePlace(place);
+        } else if (kind == PiecesID.OWN_LANCE.getId()) {
+            return lanceMovablePlace(place);
+        } else if (kind == PiecesID.OWN_KNIGHT.getId()) {
+            return knightMovablePlace(place);
+        } else if (kind == PiecesID.OWN_SILVER.getId()) {
+            return silverMovablePlace(place);
+        } else if (kind == PiecesID.OWN_GOLD.getId()) {
+            return goldMovablePlace(place);
+        } else if (kind == PiecesID.OWN_BISHOP.getId()) {
+            return bishopMovablePlace(place);
+        } else if (kind == PiecesID.OWN_ROOK.getId()) {
+            return rookMovablePlace(place);
+        } else if (kind == PiecesID.OWN_KING.getId()) {
+            return kingMovablePlace(place);
+        } else if (kind < 0) {
+            if (kind == PiecesID.OWN_PROMOTE_BISHOP.getId()) {
+                return bishopPromoteMovablePlace(place);
+            } else if (kind == PiecesID.OWN_PROMOTE_ROOK.getId()) {
+                return rookPromoteMovablePlace(place);
+            } else {
+                return goldMovablePlace(place);
+            }
+        }
+        return null;
+    }
+
+    public boolean isDropable(int putPlace, int kind) {
+        if (movablePlace(putPlace, kind) == null) {
+            return false;
+        }
+        if (isNifu(putPlace, kind)) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isNifu(int place, int kind) {
+        if (kind != PiecesID.OWN_PAWN.getId()) {
+            return false;
+        }
+        for (int i=place + up; ; i+=up) {
+            if (isInGameBoard(i)) {
+                if (mBoardPieces[i] == PiecesID.OWN_PAWN.getId()) {
+                    return true;
+                }
+            } else {
+                break;
+            }
+        }
+        for (int i=place+down; ; i+=down) {
+            if (isInGameBoard(i)) {
+                if (mBoardPieces[i] == PiecesID.OWN_PAWN.getId()) {
+                    return true;
+                }
+            } else {
+                break;
+            }
+        }
+        return false;
+    }
+
     private void initBoardStatus() {
         for (int i = 0; i < 121; i++) {
             if (i < 11) {
