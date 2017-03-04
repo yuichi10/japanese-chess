@@ -161,16 +161,16 @@ public class BoardManager {
         if (isMovable(place+up)) {
             movable.add(place+up);
         }
-        if (isInGameBoard(place+leftup)) {
+        if (isMovable(place+leftup)) {
             movable.add(place+leftup);
         }
-        if (isInGameBoard(place+rightup)) {
+        if (isMovable(place+rightup)) {
             movable.add(place+rightup);
         }
-        if (isInGameBoard(place+rightdown)) {
+        if (isMovable(place+rightdown)) {
             movable.add(place+rightdown);
         }
-        if (isInGameBoard(place+leftdown)) {
+        if (isMovable(place+leftdown)) {
             movable.add(place+leftdown);
         }
         return getListOrNoSizeAsNull(movable);
@@ -182,19 +182,19 @@ public class BoardManager {
         if (isMovable(place+up)) {
             movable.add(place+up);
         }
-        if (isInGameBoard(place+leftup)) {
+        if (isMovable(place+leftup)) {
             movable.add(place+leftup);
         }
-        if (isInGameBoard(place+rightup)) {
+        if (isMovable(place+rightup)) {
             movable.add(place+rightup);
         }
-        if (isInGameBoard(place+right)) {
+        if (isMovable(place+right)) {
             movable.add(place+right);
         }
-        if (isInGameBoard(place+left)) {
+        if (isMovable(place+left)) {
             movable.add(place+left);
         }
-        if (isInGameBoard(place+down)) {
+        if (isMovable(place+down)) {
             movable.add(place+down);
         }
         return getListOrNoSizeAsNull(movable);
@@ -218,13 +218,13 @@ public class BoardManager {
         if (isMovable(place+up)) {
             movable.add(place+up);
         }
-        if (isInGameBoard(place+right)) {
+        if (isMovable(place+right)) {
             movable.add(place+right);
         }
-        if (isInGameBoard(place+down)) {
+        if (isMovable(place+down)) {
             movable.add(place+down);
         }
-        if (isInGameBoard(place+left)) {
+        if (isMovable(place+left)) {
             movable.add(place+left);
         }
         return getListOrNoSizeAsNull(movable);
@@ -248,13 +248,13 @@ public class BoardManager {
         if (isMovable(place+rightup)) {
             movable.add(place+rightup);
         }
-        if (isInGameBoard(place+rightdown)) {
+        if (isMovable(place+rightdown)) {
             movable.add(place+rightdown);
         }
-        if (isInGameBoard(place+leftdown)) {
+        if (isMovable(place+leftdown)) {
             movable.add(place+leftdown);
         }
-        if (isInGameBoard(place+leftup)) {
+        if (isMovable(place+leftup)) {
             movable.add(place+leftup);
         }
         return getListOrNoSizeAsNull(movable);
@@ -262,28 +262,28 @@ public class BoardManager {
 
     public ArrayList<Integer> kingMovablePlace(int place) {
         ArrayList<Integer> movable = new ArrayList<>();
-        if (isInGameBoard(place+up)) {
+        if (isMovable(place+up)) {
             movable.add(place+up);
         }
-        if (isInGameBoard(place+rightup)) {
+        if (isMovable(place+rightup)) {
             movable.add(place+rightup);
         }
-        if (isInGameBoard(place+right)) {
+        if (isMovable(place+right)) {
             movable.add(place+right);
         }
-        if (isInGameBoard(place+rightdown)) {
+        if (isMovable(place+rightdown)) {
             movable.add(place+rightdown);
         }
-        if (isInGameBoard(place+down)) {
+        if (isMovable(place+down)) {
             movable.add(place+down);
         }
-        if (isInGameBoard(place+leftdown)) {
+        if (isMovable(place+leftdown)) {
             movable.add(place+leftdown);
         }
-        if (isInGameBoard(place+left)) {
+        if (isMovable(place+left)) {
             movable.add(place+left);
         }
-        if (isInGameBoard(place+leftup)) {
+        if (isMovable(place+leftup)) {
             movable.add(place+leftup);
         }
         return getListOrNoSizeAsNull(movable);
