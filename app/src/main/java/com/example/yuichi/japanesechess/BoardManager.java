@@ -102,6 +102,15 @@ public class BoardManager {
         return false;
     }
 
+    public boolean isOppMovable(int place) {
+        if (isInGameBoard(place)) {
+            if (PiecesID.isOwnPiece(mBoardPieces[place]) || mBoardPieces[place] == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void setContinueMovablePlace(ArrayList<Integer> movable, int place, int direction) {
         for (int i = place + direction; ; i += direction) {
             if (isInGameBoard(i)) {
@@ -280,6 +289,35 @@ public class BoardManager {
         return getListOrNoSizeAsNull(movable);
     }
 
+    public ArrayList<Integer> oppKingMovablePlace(int place) {
+        ArrayList<Integer> movable = new ArrayList<>();
+        if (isOppMovable(place+up)) {
+            movable.add(place+up);
+        }
+        if (isOppMovable(place+rightup)) {
+            movable.add(place+rightup);
+        }
+        if (isOppMovable(place+right)) {
+            movable.add(place+right);
+        }
+        if (isOppMovable(place+rightdown)) {
+            movable.add(place+rightdown);
+        }
+        if (isOppMovable(place+down)) {
+            movable.add(place+down);
+        }
+        if (isOppMovable(place+leftdown)) {
+            movable.add(place+leftdown);
+        }
+        if (isOppMovable(place+left)) {
+            movable.add(place+left);
+        }
+        if (isOppMovable(place+leftup)) {
+            movable.add(place+leftup);
+        }
+        return getListOrNoSizeAsNull(movable);
+    }
+
     public ArrayList<Integer> movablePlace(int place) {
 
         if (!isInGameBoard(place)) {
@@ -350,6 +388,9 @@ public class BoardManager {
             if (isNifu(putPlace, kind)) {
                 return false;
             }
+            if (isDropPawnCheckmate(putPlace, kind)) {
+                return false;
+            }
             if (putPlace < 21) {
                 return false;
             }
@@ -385,6 +426,22 @@ public class BoardManager {
                 }
             } else {
                 break;
+            }
+        }
+        return false;
+    }
+
+    public boolean isDropPawnCheckmate(int place, int kind) {
+        // 打ち歩詰めチェック
+        if (kind != PiecesID.OWN_PAWN.getId()) {
+            return false;
+        }
+        if (isInGameBoard(place+up)) {
+            if (mBoardPieces[place+up] == PiecesID.OPP_KING.getId()) {
+                ArrayList<Integer> oppKingMovable = oppKingMovablePlace(place+up);
+                if (oppKingMovable == null || oppKingMovable.size() < 2) {
+                    return true;
+                }
             }
         }
         return false;
