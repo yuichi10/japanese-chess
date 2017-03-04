@@ -45,6 +45,8 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity {
     // 自身のターン
     int NOT_TURN_DECIDED = -1, TURN_FIRST = 0, TURN_SECOND = 1;
+    // 持ち駒から出す時のポジション
+    final int inHandPosition = -1;
 
     private boolean isInit = false;
 
@@ -305,6 +307,13 @@ public class GameActivity extends AppCompatActivity {
         setOnBoardPieceView(postPos);
     }
 
+    private int demotePiece(int kind) {
+        if (kind < 0) {
+            return kind * -1;
+        }
+        return kind;
+    }
+
     private int swapOwnAndOppKind(int kind) {
         if (PiecesID.isOppPiece(kind)) {
             if (kind < 0) {
@@ -320,7 +329,7 @@ public class GameActivity extends AppCompatActivity {
         return kind;
     }
 
-    private void setInHandNum(int kind) {
+    private void setInHandNumTextView(int kind) {
         TextView textView = mInHandNumTextView.get(kind);
         textView.setText("x" + mInHandPieces.get(kind));
     }
@@ -328,13 +337,15 @@ public class GameActivity extends AppCompatActivity {
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
         if (PiecesID.isOppPiece(takePieceKind)) {
-            int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
-            mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
-            setInHandNum(swapOwnAndOppKind(takePieceKind));
+            int tookPiece = swapOwnAndOppKind(demotePiece(takePieceKind));
+            int curNum = mInHandPieces.get(tookPiece);
+            mInHandPieces.put(tookPiece, curNum + 1);
+            setInHandNumTextView(tookPiece);
         } else if (PiecesID.isOwnPiece(takePieceKind)) {
-            int curNum = mInHandPieces.get(swapOwnAndOppKind(takePieceKind));
-            mInHandPieces.put(swapOwnAndOppKind(takePieceKind), curNum + 1);
-            setInHandNum(swapOwnAndOppKind(takePieceKind));
+            int tookPiece = swapOwnAndOppKind(demotePiece(takePieceKind));
+            int curNum = mInHandPieces.get(tookPiece);
+            mInHandPieces.put(tookPiece, curNum + 1);
+            setInHandNumTextView(tookPiece);
         }
     }
 
