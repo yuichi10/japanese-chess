@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,8 +46,6 @@ import java.util.Random;
 public class GameActivity extends AppCompatActivity {
     // 自身のターン
     int NOT_TURN_DECIDED = -1, TURN_FIRST = 0, TURN_SECOND = 1;
-    // 持ち駒から出す時のポジション
-    final int inHandPosition = -1;
 
     private boolean isInit = false;
 
@@ -148,6 +147,7 @@ public class GameActivity extends AppCompatActivity {
         mInHandImageButtons.put(PiecesID.OPP_GOLD.getId(), (ImageButton)findViewById(R.id.inHand_opp_gold_button));
         mInHandImageButtons.put(PiecesID.OPP_BISHOP.getId(), (ImageButton)findViewById(R.id.inHand_opp_bishop_button));
         mInHandImageButtons.put(PiecesID.OPP_ROOK.getId(), (ImageButton)findViewById(R.id.inHand_opp_rook_button));
+        initInHandPieceButton();
 
         mInHandNumTextView.put(PiecesID.OWN_PAWN.getId(), (TextView)findViewById(R.id.inHand_own_pawn_num_text_view));
         mInHandNumTextView.put(PiecesID.OWN_LANCE.getId(), (TextView)findViewById(R.id.inHand_own_lance_num_text_view));
@@ -163,6 +163,24 @@ public class GameActivity extends AppCompatActivity {
         mInHandNumTextView.put(PiecesID.OPP_GOLD.getId(), (TextView)findViewById(R.id.inHand_opp_gold_num_text_view));
         mInHandNumTextView.put(PiecesID.OPP_BISHOP.getId(), (TextView)findViewById(R.id.inHand_opp_bishop_num_text_view));
         mInHandNumTextView.put(PiecesID.OPP_ROOK.getId(), (TextView)findViewById(R.id.inHand_opp_rook_num_text_view));
+    }
+
+    private void initInHandPieceButton() {
+        // 持ち駒のボタンが押された時 (place は種類 * -1)
+        for (final Map.Entry<Integer, ImageButton> m : mInHandImageButtons.entrySet()) {
+            if (PiecesID.isOwnPiece(m.getKey())) {
+                m.getValue().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mIsMovable) {
+                            if (mInHandPieces.get(m.getKey()) > 0) {
+                                mChosePlace = m.getKey() * -1;
+                            }
+                        }
+                    }
+                });
+            }
+        }
     }
 
     private void initGameInfoTextView() {
@@ -267,7 +285,11 @@ public class GameActivity extends AppCompatActivity {
                 if (mCurrentTurn % 2 == mOwnTurn) {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
-                        setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                        if (isInHandPlace(mMoveModel.getPastPos())) {
+                            setHandMoveImage(convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                        } else {
+                            setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                        }
                     }
                     mIsMovable = true;
                     mChosePlace = PiecesID.NOTHING.getId();
@@ -305,6 +327,13 @@ public class GameActivity extends AppCompatActivity {
         //新しい画像表示
         boardManager.setBoardPiece(postPos, kind);
         setOnBoardPieceView(postPos);
+    }
+
+    private void setHandMoveImage(int place, int kind) {
+        boardManager.setBoardPiece(place, kind);
+        mInHandPieces.put(kind, mInHandPieces.get(kind)-1);
+        setInHandNumTextView(kind);
+        setOnBoardPieceView(place);
     }
 
     private int demotePiece(int kind) {
@@ -387,7 +416,11 @@ public class GameActivity extends AppCompatActivity {
 
     private void movePiece(final int pastPlace, int postPlace, final int kind) {
         // 実際に駒を動かす
-        if (!PiecesID.isPromotablePiece(kind) || (pastPlace > 44 && postPlace > 44)) {
+        if (isInHandPlace(pastPlace)) {
+            // 持ち駒を選ばれた時
+            sendMoveInfo(pastPlace, postPlace, kind);
+            setHandMoveImage(postPlace, kind);
+        } else if (!PiecesID.isPromotablePiece(kind) || (pastPlace > 44 && postPlace > 44)) {
             sendMoveInfo(pastPlace, postPlace, kind);
             setMoveImages(pastPlace, postPlace, kind);
         } else {
@@ -435,6 +468,8 @@ public class GameActivity extends AppCompatActivity {
                 mChosePlace = place;
                 delPlaceHighLight();
                 showPlaceHighLight();
+            } else if (boardManager.getBoardPiece(place) == PiecesID.NOTHING.getId() && isInHandPlace(mChosePlace)) {
+                movePiece(mChosePlace, place, mChosePlace * -1);
             } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
                 ArrayList<Integer> sss = boardManager.movablePlace(mChosePlace);
                 if (boardManager.movablePlace(mChosePlace) != null && boardManager.movablePlace(mChosePlace).indexOf(place) != -1) {
@@ -724,6 +759,13 @@ public class GameActivity extends AppCompatActivity {
             return "王";
         }
         return "";
+    }
+
+    private boolean isInHandPlace(int place) {
+        if (PiecesID.OWN_PAWN.getId() * -1 >= place && PiecesID.OWN_GOLD.getId() * -1 <= place) {
+            return true;
+        }
+        return false;
     }
 
     private void setFirstPlayer(RoomModel room) {
