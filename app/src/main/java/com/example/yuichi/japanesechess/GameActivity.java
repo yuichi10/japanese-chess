@@ -65,8 +65,10 @@ public class GameActivity extends AppCompatActivity {
     private boolean mIsMovable = false;             //自身のターンかどうか
     private int mChosePlace = 0;              //動かす駒が選択されたかどうか
     private MoveModel mMoveModel = null;
+    private RoomModel mRoomModel = null;
     private int mCurrentTurn = 0;
     private ImageView mHighLightImageView;
+    private boolean mIsFinish = false; //ゲームが終了したかどうか
 
     private TextView mWhichTurnTextView;    // どっちのターンか表示
     private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
@@ -214,28 +216,34 @@ public class GameActivity extends AppCompatActivity {
         ValueEventListener roomEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                RoomModel room = dataSnapshot.getValue(RoomModel.class);
-                if (room == null) {
+                mRoomModel = dataSnapshot.getValue(RoomModel.class);
+                if (mRoomModel == null) {
                     Toast.makeText(GameActivity.this, "画面を終了または、相手がルームを抜けました。",
                             Toast.LENGTH_SHORT).show();
                     finish();
                     return;
 
                 }
-                if (room.getProgress() == RoomProgress.GATHERED && room.getFirst().equals(mUserID)) {
+                if (mRoomModel.getProgress() == RoomProgress.GATHERED && mRoomModel.getFirst().equals(mUserID)) {
                     // ゲーム開始時に先行後攻を決める
-                    setFirstPlayer(room);
-                    room.setProgress(RoomProgress.PLAING);
-                    mRoomRef.setValue(room);
+                    setFirstPlayer(mRoomModel);
+                    mRoomModel.setProgress(RoomProgress.PLAING);
+                    mRoomRef.setValue(mRoomModel);
                     // 初期値のmove modelを保存
                     MoveModel moveModel = new MoveModel();
                     mDatabase.child(getString(R.string.firebase_move)).child(mRoomID).setValue(moveModel);
-                } else if (room.getProgress() == RoomProgress.PLAING && mOwnTurn == NOT_TURN_DECIDED) {
-                    if (room.getFirst().equals(mUserID)) {
+                } else if (mRoomModel.getProgress() == RoomProgress.PLAING && mOwnTurn == NOT_TURN_DECIDED) {
+                    if (mRoomModel.getFirst().equals(mUserID)) {
                         mOwnTurn = TURN_FIRST;
                     } else {
                         mOwnTurn = TURN_SECOND;
                     }
+                } else if (mRoomModel.getProgress() == RoomProgress.FINISH) {
+                    // todo: ゲームの終了
+                    mIsFinish = true;
+                    mIsMovable = false;
+                    Toast.makeText(GameActivity.this, "ゲームが終了しました",
+                            Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -291,10 +299,12 @@ public class GameActivity extends AppCompatActivity {
                             setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
                         }
                     }
-                    mIsMovable = true;
-                    mChosePlace = PiecesID.NOTHING.getId();
-                    Toast.makeText(GameActivity.this, "自分のターン",
-                            Toast.LENGTH_SHORT).show();
+                    if (!mIsFinish) {
+                        mIsMovable = true;
+                        mChosePlace = PiecesID.NOTHING.getId();
+                        Toast.makeText(GameActivity.this, "自分のターン",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     mIsMovable = false;
                     mChosePlace = PiecesID.NOTHING.getId();
@@ -313,6 +323,20 @@ public class GameActivity extends AppCompatActivity {
         moveRef.addValueEventListener(moveEventListener);
     }
 
+    private boolean isCheckmate(int postPos) {
+        if (boardManager.getBoardPiece(postPos) == PiecesID.OPP_KING.getId()) {
+            finishGame();
+            return true;
+        }
+        return false;
+    }
+
+    private void finishGame() {
+        mRoomModel.setProgress(RoomProgress.FINISH);
+        mRoomModel.setWinner(mUserID);
+        mRoomRef.setValue(mRoomModel);
+    }
+
     private void setMoveImages(int pastPos, int postPos, int kind) {
         // 過去の画像を削除
         boardManager.setBoardPiece(pastPos, PiecesID.NOTHING.getId());
@@ -320,6 +344,7 @@ public class GameActivity extends AppCompatActivity {
         mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(pastPos));
         mPiecesViewList.remove(pastPos);
         // もし駒を取っていたら追加
+        isCheckmate(postPos);
         setInHandPieces(boardManager.getBoardPiece(postPos));
         mLayoutParamsList.remove(postPos);
         mOnBoardPiecesLayout.removeViewInLayout(mPiecesViewList.get(postPos));
@@ -359,12 +384,18 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void setInHandNumTextView(int kind) {
+        if (!mInHandNumTextView.containsKey(kind)) {
+            return;
+        }
         TextView textView = mInHandNumTextView.get(kind);
         textView.setText("x" + mInHandPieces.get(kind));
     }
 
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
+        if (!mInHandPieces.containsKey(swapOwnAndOppKind(demotePiece(takePieceKind)))) {
+            return;
+        }
         if (PiecesID.isOppPiece(takePieceKind)) {
             int tookPiece = swapOwnAndOppKind(demotePiece(takePieceKind));
             int curNum = mInHandPieces.get(tookPiece);
