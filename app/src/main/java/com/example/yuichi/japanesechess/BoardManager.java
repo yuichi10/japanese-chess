@@ -345,12 +345,22 @@ public class BoardManager {
         return null;
     }
 
-    public boolean isDropable(int putPlace, int kind) {
-        if (movablePlace(putPlace, kind) == null) {
-            return false;
-        }
-        if (isNifu(putPlace, kind)) {
-            return false;
+    public boolean isDroppable(int putPlace, int kind) {
+        if (kind == PiecesID.OWN_PAWN.getId()) {
+            if (isNifu(putPlace, kind)) {
+                return false;
+            }
+            if (putPlace < 21) {
+                return false;
+            }
+        } else if (kind == PiecesID.OWN_KNIGHT.getId()) {
+            if (putPlace < 32) {
+                return false;
+            }
+        } else if (kind == PiecesID.OWN_LANCE.getId()) {
+            if (putPlace < 21) {
+                return false;
+            }
         }
         return true;
     }
