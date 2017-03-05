@@ -176,6 +176,7 @@ public class GameActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         if (mIsMovable) {
                             if (mInHandPieces.get(m.getKey()) > 0) {
+                                delPlaceHighLight();
                                 mChosePlace = m.getKey() * -1;
                             }
                         }
