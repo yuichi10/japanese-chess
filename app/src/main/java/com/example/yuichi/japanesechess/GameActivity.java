@@ -358,13 +358,6 @@ public class GameActivity extends AppCompatActivity {
         setOnBoardPieceView(place);
     }
 
-    private int demotePiece(int kind) {
-        if (kind < 0) {
-            return kind * -1;
-        }
-        return kind;
-    }
-
     private int swapOwnAndOppKind(int kind) {
         if (PiecesID.isOppPiece(kind)) {
             if (kind < 0) {
@@ -390,16 +383,16 @@ public class GameActivity extends AppCompatActivity {
 
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
-        if (!mInHandPieces.containsKey(swapOwnAndOppKind(demotePiece(takePieceKind)))) {
+        if (!mInHandPieces.containsKey(swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind)))) {
             return;
         }
         if (PiecesID.isOppPiece(takePieceKind)) {
-            int tookPiece = swapOwnAndOppKind(demotePiece(takePieceKind));
+            int tookPiece = swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
             int curNum = mInHandPieces.get(tookPiece);
             mInHandPieces.put(tookPiece, curNum + 1);
             setInHandNumTextView(tookPiece);
         } else if (PiecesID.isOwnPiece(takePieceKind)) {
-            int tookPiece = swapOwnAndOppKind(demotePiece(takePieceKind));
+            int tookPiece = swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
             int curNum = mInHandPieces.get(tookPiece);
             mInHandPieces.put(tookPiece, curNum + 1);
             setInHandNumTextView(tookPiece);

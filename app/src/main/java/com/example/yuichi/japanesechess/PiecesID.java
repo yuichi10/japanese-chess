@@ -73,4 +73,11 @@ public enum PiecesID {
         }
         return false;
     }
+
+    public static int demotePiece(int kind) {
+        if (kind < 0) {
+            return kind * -1;
+        }
+        return kind;
+    }
 }
