@@ -86,6 +86,11 @@ public class BoardManager {
         }
     }
 
+    public int convertOppToOwnViewPlace(int place) {
+        return 120 - place;
+    }
+
+
     public ArrayList<Integer> getListOrNoSizeAsNull(ArrayList<Integer> list) {
         if (list.size() == 0) {
             return null;

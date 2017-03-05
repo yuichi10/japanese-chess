@@ -255,9 +255,6 @@ public class GameActivity extends AppCompatActivity {
         mRoomRef.addValueEventListener(roomEventListener);
     }
 
-    private int convertOppToOwnViewPlace(int place) {
-        return 120 - place;
-    }
 
     private void setWhichTurnInfo(int turn) {
         // どっちのターンか表示
@@ -271,7 +268,7 @@ public class GameActivity extends AppCompatActivity {
     private void setWhereOppMoveInfo(MoveModel move) {
         // 相手がどこに打ったか表示
         if (move.getTurnNum() % 2 == mOwnTurn) {
-            int pos = convertOppToOwnViewPlace(move.getPostPos());
+            int pos = boardManager.convertOppToOwnViewPlace(move.getPostPos());
             String kind = getPieceName(move.getKind());
             int ypos = pos / 11;
             int xpos = pos % 11;
@@ -294,9 +291,9 @@ public class GameActivity extends AppCompatActivity {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
                         if (isInHandPlace(mMoveModel.getPastPos())) {
-                            setHandMoveImage(convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                            setHandMoveImage(boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
                         } else {
-                            setMoveImages(convertOppToOwnViewPlace(mMoveModel.getPastPos()), convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                            setMoveImages(boardManager.convertOppToOwnViewPlace(mMoveModel.getPastPos()), boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
                         }
                     }
                     if (!mIsFinish) {
