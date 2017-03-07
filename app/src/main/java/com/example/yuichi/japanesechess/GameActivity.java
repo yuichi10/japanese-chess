@@ -72,6 +72,8 @@ public class GameActivity extends AppCompatActivity {
 
     private TextView mWhichTurnTextView;    // どっちのターンか表示
     private TextView mWhereOppMoveTextView; // 相手がどこに打ったか表示
+    private TextView mWhichTurnIamTextView; // 自分のターンがどっちか表示
+    private TextView mWhichTurnOppIsTextView;   // 相手のターンがどっちか表示
 
     private Map<Integer, Integer> mInHandPieces; // key: piece id, value: num
     private Map<Integer, ImageButton> mInHandImageButtons;   // 持ち駒ボタン
@@ -190,6 +192,8 @@ public class GameActivity extends AppCompatActivity {
         // gameのinfoを表示するtext view の初期化
         mWhichTurnTextView = (TextView)findViewById(R.id.which_turn_text_view);
         mWhereOppMoveTextView = (TextView)findViewById(R.id.where_opp_move_info_text_view);
+        mWhichTurnIamTextView = (TextView)findViewById(R.id.own_turn_text_view);
+        mWhichTurnOppIsTextView = (TextView)findViewById(R.id.opp_turn_text_view);
     }
 
     private void initBoardView() {
@@ -236,8 +240,12 @@ public class GameActivity extends AppCompatActivity {
                 } else if (mRoomModel.getProgress() == RoomProgress.PLAING && mOwnTurn == NOT_TURN_DECIDED) {
                     if (mRoomModel.getFirst().equals(mUserID)) {
                         mOwnTurn = TURN_FIRST;
+                        mWhichTurnIamTextView.setText("先攻");
+                        mWhichTurnOppIsTextView.setText("後攻");
                     } else {
                         mOwnTurn = TURN_SECOND;
+                        mWhichTurnIamTextView.setText("後攻");
+                        mWhichTurnOppIsTextView.setText("先攻");
                     }
                 } else if (mRoomModel.getProgress() == RoomProgress.FINISH) {
                     // todo: ゲームの終了
