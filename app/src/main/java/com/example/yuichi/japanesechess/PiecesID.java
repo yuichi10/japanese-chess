@@ -80,4 +80,40 @@ public enum PiecesID {
         }
         return kind;
     }
+
+    public static int swapOwnAndOppKind(int kind) {
+        if (isOppPiece(kind)) {
+            if (kind < 0) {
+                return kind + 10;
+            }
+            return kind - 10;
+        } else if (isOwnPiece(kind)) {
+            if (kind < 0) {
+                return kind - 10;
+            }
+            return kind + 10;
+        }
+        return kind;
+    }
+
+    public static String getPieceName(int kind) {
+        if (kind == OWN_PAWN.getId() || kind == OWN_PROMOTE_PAWN.getId()) {
+            return "歩";
+        } else if (kind == OWN_LANCE.getId() || kind == OWN_PROMOTE_LANCE.getId()) {
+            return "槍";
+        } else if (kind == OWN_KNIGHT.getId() || kind == OWN_PROMOTE_KNIGHT.getId()) {
+            return "馬";
+        } else if (kind == OWN_SILVER.getId() || kind == OWN_PROMOTE_SILVER.getId()) {
+            return "銀";
+        } else if (kind == OWN_GOLD.getId()) {
+            return "金";
+        } else if (kind == OWN_BISHOP.getId() || kind == OWN_PROMOTE_BISHOP.getId()) {
+            return "角";
+        } else if (kind == OWN_ROOK.getId() || kind == OWN_PROMOTE_ROOK.getId()) {
+            return "飛";
+        } else if (kind == OWN_KING.getId()) {
+            return "王";
+        }
+        return "";
+    }
 }

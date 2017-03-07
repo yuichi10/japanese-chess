@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -30,9 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -136,7 +132,6 @@ public class GameActivity extends AppCompatActivity {
                 mInHandPieces.put(pieceID.getId(), 0);
             }
         }
-        ImageButton image = (ImageButton)findViewById(R.id.inHand_own_pawn_button);
         mInHandImageButtons.put(PiecesID.OWN_PAWN.getId(), (ImageButton)findViewById(R.id.inHand_own_pawn_button));
         mInHandImageButtons.put(PiecesID.OWN_LANCE.getId(), (ImageButton)findViewById(R.id.inHand_own_lance_button));
         mInHandImageButtons.put(PiecesID.OWN_KNIGHT.getId(), (ImageButton)findViewById(R.id.inHand_own_knight_button));
@@ -278,7 +273,7 @@ public class GameActivity extends AppCompatActivity {
         // 相手がどこに打ったか表示
         if (move.getTurnNum() % 2 == mOwnTurn) {
             int pos = boardManager.convertOppToOwnViewPlace(move.getPostPos());
-            String kind = getPieceName(move.getKind());
+            String kind = PiecesID.getPieceName(move.getKind());
             int ypos = pos / 11;
             int xpos = pos % 11;
             mWhereOppMoveTextView.setText(xpos + ":" + ypos + " " + kind);
@@ -300,9 +295,9 @@ public class GameActivity extends AppCompatActivity {
                     if (mMoveModel.getTurnNum() != 0) {
                         // 相手の駒を自身の画面に反映
                         if (isInHandPlace(mMoveModel.getPastPos())) {
-                            setHandMoveImage(boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                            setHandMoveImage(boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()), PiecesID.swapOwnAndOppKind(mMoveModel.getKind()));
                         } else {
-                            setMoveImages(boardManager.convertOppToOwnViewPlace(mMoveModel.getPastPos()), boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()), swapOwnAndOppKind(mMoveModel.getKind()));
+                            setMoveImages(boardManager.convertOppToOwnViewPlace(mMoveModel.getPastPos()), boardManager.convertOppToOwnViewPlace(mMoveModel.getPostPos()),PiecesID.swapOwnAndOppKind(mMoveModel.getKind()));
                         }
                     }
                     if (!mIsFinish) {
@@ -367,21 +362,6 @@ public class GameActivity extends AppCompatActivity {
         setOnBoardPieceView(place);
     }
 
-    private int swapOwnAndOppKind(int kind) {
-        if (PiecesID.isOppPiece(kind)) {
-            if (kind < 0) {
-                return kind + 10;
-            }
-            return kind - 10;
-        } else if (PiecesID.isOwnPiece(kind)) {
-            if (kind < 0) {
-                return kind - 10;
-            }
-            return kind + 10;
-        }
-        return kind;
-    }
-
     private void setInHandNumTextView(int kind) {
         if (!mInHandNumTextView.containsKey(kind)) {
             return;
@@ -392,16 +372,16 @@ public class GameActivity extends AppCompatActivity {
 
     private void setInHandPieces(int takePieceKind) {
         // 取った駒を追加
-        if (!mInHandPieces.containsKey(swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind)))) {
+        if (!mInHandPieces.containsKey(PiecesID.swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind)))) {
             return;
         }
         if (PiecesID.isOppPiece(takePieceKind)) {
-            int tookPiece = swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
+            int tookPiece = PiecesID.swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
             int curNum = mInHandPieces.get(tookPiece);
             mInHandPieces.put(tookPiece, curNum + 1);
             setInHandNumTextView(tookPiece);
         } else if (PiecesID.isOwnPiece(takePieceKind)) {
-            int tookPiece = swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
+            int tookPiece = PiecesID.swapOwnAndOppKind(PiecesID.demotePiece(takePieceKind));
             int curNum = mInHandPieces.get(tookPiece);
             mInHandPieces.put(tookPiece, curNum + 1);
             setInHandNumTextView(tookPiece);
@@ -503,7 +483,6 @@ public class GameActivity extends AppCompatActivity {
                     movePiece(mChosePlace, place, mChosePlace * -1);
                 }
             } else if ((PiecesID.isOppPiece(boardManager.getBoardPiece(place)) || boardManager.getBoardPiece(place) == 0) && mChosePlace != 0) {
-                ArrayList<Integer> sss = boardManager.movablePlace(mChosePlace);
                 if (boardManager.movablePlace(mChosePlace) != null && boardManager.movablePlace(mChosePlace).indexOf(place) != -1) {
                     movePiece(mChosePlace, place, boardManager.getBoardPiece(mChosePlace));
                     delPlaceHighLight();
@@ -772,32 +751,8 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private String getPieceName(int kind) {
-        if (kind == PiecesID.OWN_PAWN.getId() || kind == PiecesID.OWN_PROMOTE_PAWN.getId()) {
-            return "歩";
-        } else if (kind == PiecesID.OWN_LANCE.getId() || kind == PiecesID.OWN_PROMOTE_LANCE.getId()) {
-            return "槍";
-        } else if (kind == PiecesID.OWN_KNIGHT.getId() || kind == PiecesID.OWN_PROMOTE_KNIGHT.getId()) {
-            return "馬";
-        } else if (kind == PiecesID.OWN_SILVER.getId() || kind == PiecesID.OWN_PROMOTE_SILVER.getId()) {
-            return "銀";
-        } else if (kind == PiecesID.OWN_GOLD.getId()) {
-            return "金";
-        } else if (kind == PiecesID.OWN_BISHOP.getId() || kind == PiecesID.OWN_PROMOTE_BISHOP.getId()) {
-            return "角";
-        } else if (kind == PiecesID.OWN_ROOK.getId() || kind == PiecesID.OWN_PROMOTE_ROOK.getId()) {
-            return "飛";
-        } else if (kind == PiecesID.OWN_KING.getId()) {
-            return "王";
-        }
-        return "";
-    }
-
     private boolean isInHandPlace(int place) {
-        if (PiecesID.OWN_PAWN.getId() * -1 >= place && PiecesID.OWN_GOLD.getId() * -1 <= place) {
-            return true;
-        }
-        return false;
+        return (PiecesID.OWN_PAWN.getId() * -1 >= place && PiecesID.OWN_GOLD.getId() * -1 <= place);
     }
 
     private void setFirstPlayer(RoomModel room) {
